@@ -3,7 +3,10 @@ import { Link } from 'wouter';
 import { useCart } from '@/lib/contexts/CartContext';
 import { 
   X, 
-  ShoppingBag
+  ShoppingBag,
+  Plus,
+  Minus,
+  MessageCircle
 } from 'lucide-react';
 import { 
   Sheet, 
@@ -87,7 +90,7 @@ export default function CartDrawer() {
                         className="h-8 w-8" 
                         onClick={() => handleUpdateQuantity(item.productId, item.quantity - 1)}
                       >
-                        <X className="h-4 w-4" />
+                        <Minus className="h-4 w-4" />
                       </Button>
                       <span className="w-8 text-center">{item.quantity}</span>
                       <Button 
@@ -96,7 +99,7 @@ export default function CartDrawer() {
                         className="h-8 w-8" 
                         onClick={() => handleUpdateQuantity(item.productId, item.quantity + 1)}
                       >
-                        <X className="h-4 w-4" />
+                        <Plus className="h-4 w-4" />
                       </Button>
                     </div>
                   </div>
@@ -114,15 +117,16 @@ export default function CartDrawer() {
                   <span className="font-medium">{formatCurrency(subtotal)}</span>
                 </div>
                 <div className="grid w-full gap-2">
-                  <Button asChild>
-                    <Link href="/checkout">
-                      Checkout
-                    </Link>
-                  </Button>
-                  <Button variant="outline" asChild>
-                    <Link href="/cart">
-                      View Cart
-                    </Link>
+                  <Button 
+                    className="bg-green-600 hover:bg-green-700 text-white"
+                    onClick={() => {
+                      const itemsList = items.map(item => `${item.name} (${item.quantity}x) - ${formatCurrency(item.price * item.quantity)}`).join('\n');
+                      const message = `Hello, I would like to place an order:\n\n${itemsList}\n\nTotal: ${formatCurrency(subtotal)}`;
+                      window.open(`https://wa.me/2348068989798?text=${encodeURIComponent(message)}`, '_blank');
+                    }}
+                  >
+                    <MessageCircle className="mr-2 h-5 w-5" />
+                    Checkout on WhatsApp
                   </Button>
                 </div>
               </SheetFooter>
