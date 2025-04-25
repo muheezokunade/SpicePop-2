@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/sheet";
 import { MAIN_NAV_ITEMS } from "@/lib/constants";
 import { useCart } from "@/lib/contexts/CartContext";
-import { SpicePopLogo } from "./SpicePopLogo";
+import { NewSpicePopLogo } from "./NewSpicePopLogo";
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
@@ -29,7 +29,7 @@ export default function Header() {
         <div className="flex items-center gap-6">
           <Link href="/">
             <a className="flex items-center gap-2">
-              <SpicePopLogo width={40} height={40} />
+              <NewSpicePopLogo width={40} height={40} variant="dark" />
               <span className="font-semibold text-lg hidden md:inline-block">SpicePop</span>
             </a>
           </Link>
@@ -75,7 +75,7 @@ export default function Header() {
                 <div className="px-2 py-6">
                   <Link href="/" onClick={() => setIsOpen(false)}>
                     <a className="flex items-center gap-2 mb-8">
-                      <SpicePopLogo width={40} height={40} />
+                      <NewSpicePopLogo width={40} height={40} variant="dark" />
                       <span className="font-semibold text-lg">SpicePop</span>
                     </a>
                   </Link>
