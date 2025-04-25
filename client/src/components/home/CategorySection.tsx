@@ -20,11 +20,13 @@ export default function CategorySection() {
               <h2 className="font-poppins font-bold text-3xl md:text-4xl text-dark mb-2">
                 <Skeleton className="h-10 w-40" />
               </h2>
-              <p className="text-gray-600 max-w-md">
+              <div className="text-gray-600 max-w-md">
                 <Skeleton className="h-4 w-80" />
-              </p>
+              </div>
             </div>
-            <Skeleton className="h-10 w-32 mt-4 md:mt-0" />
+            <div className="mt-4 md:mt-0">
+              <Skeleton className="h-10 w-32" />
+            </div>
           </div>
           
           <div className="grid grid-cols-2 md:grid-cols-6 gap-4 md:gap-6">
