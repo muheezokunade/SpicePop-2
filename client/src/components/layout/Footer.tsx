@@ -22,9 +22,7 @@ export default function Footer() {
           {/* Logo and About */}
           <div className="space-y-4">
             <Link href="/">
-              <a className="inline-block">
-                <Logo />
-              </a>
+              <Logo />
             </Link>
             <p className="text-sm text-gray-600">
               Premium Nigerian spices and foodstuffs. 
@@ -51,9 +49,9 @@ export default function Footer() {
               {FOOTER_LINKS.quickLinks.map(link => (
                 <li key={link.href}>
                   <Link href={link.href}>
-                    <a className="text-gray-600 hover:text-primary transition-colors text-sm">
+                    <span className="text-gray-600 hover:text-primary transition-colors text-sm cursor-pointer">
                       {link.label}
-                    </a>
+                    </span>
                   </Link>
                 </li>
               ))}
@@ -114,9 +112,9 @@ export default function Footer() {
           <div className="flex space-x-6 mt-4 md:mt-0">
             {FOOTER_LINKS.legal.map(link => (
               <Link key={link.href} href={link.href}>
-                <a className="text-xs text-gray-500 hover:text-primary transition-colors">
+                <span className="text-xs text-gray-500 hover:text-primary transition-colors cursor-pointer">
                   {link.label}
-                </a>
+                </span>
               </Link>
             ))}
           </div>

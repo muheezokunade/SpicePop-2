@@ -31,9 +31,9 @@ export default function BlogCard({ post }: BlogCardProps) {
         
         <CardTitle className="line-clamp-2">
           <Link href={`/blog/${post.slug}`}>
-            <a className="hover:text-primary transition-colors">
+            <span className="hover:text-primary transition-colors cursor-pointer">
               {post.title}
-            </a>
+            </span>
           </Link>
         </CardTitle>
         
@@ -50,12 +50,10 @@ export default function BlogCard({ post }: BlogCardProps) {
       
       <CardFooter className="pt-4 flex justify-between items-center">
         <Link href={`/blog/${post.slug}`}>
-          <a>
-            <Button variant="link" className="px-0 text-primary font-medium">
-              Read More
-              <ArrowRight className="h-4 w-4 ml-1" />
-            </Button>
-          </a>
+          <Button variant="link" className="px-0 text-primary font-medium cursor-pointer">
+            Read More
+            <ArrowRight className="h-4 w-4 ml-1" />
+          </Button>
         </Link>
         
         {post.categoryId && (

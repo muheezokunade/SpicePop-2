@@ -44,10 +44,10 @@ export default function BlogPostPage() {
                 The post you're looking for couldn't be found.
               </p>
               <Link href="/blog">
-                <a className="flex items-center text-primary hover:underline">
+                <span className="flex items-center text-primary hover:underline cursor-pointer">
                   <ArrowLeft className="h-4 w-4 mr-2" />
                   Back to Blog
-                </a>
+                </span>
               </Link>
             </div>
           </div>
@@ -59,10 +59,10 @@ export default function BlogPostPage() {
                 The post you're looking for doesn't exist or has been removed.
               </p>
               <Link href="/blog">
-                <a className="flex items-center text-primary hover:underline">
+                <span className="flex items-center text-primary hover:underline cursor-pointer">
                   <ArrowLeft className="h-4 w-4 mr-2" />
                   Back to Blog
-                </a>
+                </span>
               </Link>
             </div>
           </div>
@@ -84,8 +84,10 @@ export default function BlogPostPage() {
               <Breadcrumb className="mb-6">
                 <BreadcrumbItem>
                   <BreadcrumbLink href="/">
-                    <HomeIcon className="h-4 w-4 mr-2" />
-                    Home
+                    <span className="flex items-center">
+                      <HomeIcon className="h-4 w-4 mr-2" />
+                      Home
+                    </span>
                   </BreadcrumbLink>
                 </BreadcrumbItem>
                 <BreadcrumbSeparator />
@@ -136,10 +138,10 @@ export default function BlogPostPage() {
               {/* Back to Blog Link */}
               <div className="mt-12 pt-6 border-t">
                 <Link href="/blog">
-                  <a className="inline-flex items-center text-primary hover:underline">
+                  <span className="inline-flex items-center text-primary hover:underline cursor-pointer">
                     <ArrowLeft className="h-4 w-4 mr-2" />
                     Back to Blog
-                  </a>
+                  </span>
                 </Link>
               </div>
             </div>
