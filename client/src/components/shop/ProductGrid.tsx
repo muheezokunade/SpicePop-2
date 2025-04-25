@@ -103,11 +103,23 @@ export default function ProductGrid({ filters }: ProductGridProps) {
     window.dispatchEvent(new Event('popstate'));
   };
 
-  // Handle mobile sort change
+  // Handle sort change
   const handleMobileSortChange = (value: string) => {
     setMobileSort(value);
-    const newFilters = { ...filters, sort: value };
+    const newFilters = { ...filters };
+    
+    if (value === 'name-asc') {
+      delete newFilters.sort;
+    } else {
+      newFilters.sort = value;
+    }
+    
     onUpdateFilters(newFilters);
+    
+    // Force a page refresh to apply the sort
+    setTimeout(() => {
+      window.dispatchEvent(new Event('popstate'));
+    }, 10);
   };
   
   // Loading state
@@ -166,8 +178,8 @@ export default function ProductGrid({ filters }: ProductGridProps) {
         </p>
         
         <div className="flex gap-3 w-full sm:w-auto">
-          {/* Mobile sort select */}
-          <div className="block lg:hidden flex-1">
+          {/* Sort select */}
+          <div className="block flex-1 sm:w-48">
             <Select value={mobileSort} onValueChange={handleMobileSortChange}>
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Sort by" />

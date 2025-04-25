@@ -200,10 +200,16 @@ export default function ProductFilters({
             value={sortOption} 
             onValueChange={(value) => {
               setSortOption(value);
-              const newFilters = { ...initialFilters, sort: value };
+              const newFilters = { ...initialFilters };
+              
               if (value === 'name-asc') {
-                delete newFilters.sort;
+                // Default sorting is name-asc, so no need to include it in filters
+                const { sort, ...rest } = newFilters;
+                Object.assign(newFilters, rest);
+              } else {
+                newFilters.sort = value;
               }
+              
               onUpdateFilters(newFilters);
             }}
           >
@@ -308,9 +314,8 @@ export default function ProductFilters({
                       className="ml-1 h-3 w-3 cursor-pointer" 
                       onClick={() => {
                         setSortOption('name-asc');
-                        const newFilters = { ...initialFilters };
-                        delete newFilters.sort;
-                        onUpdateFilters(newFilters);
+                        const { sort, ...rest } = initialFilters;
+                        onUpdateFilters(rest);
                       }}
                     />
                   </Badge>
