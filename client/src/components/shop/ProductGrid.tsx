@@ -82,15 +82,6 @@ export default function ProductGrid({ filters }: ProductGridProps) {
     setMobileSort(filters.sort || 'name-asc');
   }, [filters.sort]);
   
-  // Handle mobile sort change
-  const handleMobileSortChange = (value: string) => {
-    setMobileSort(value);
-    const newFilters = { ...filters, sort: value };
-    
-    // Use prop-based communication instead of custom events
-    onUpdateFilters && onUpdateFilters(newFilters);
-  };
-  
   // Add a function to communicate with parent
   const onUpdateFilters = (newFilters: Record<string, string>) => {
     // Update URL with new filters
@@ -110,6 +101,13 @@ export default function ProductGrid({ filters }: ProductGridProps) {
     
     // This will trigger a re-render with updated filters
     window.dispatchEvent(new Event('popstate'));
+  };
+
+  // Handle mobile sort change
+  const handleMobileSortChange = (value: string) => {
+    setMobileSort(value);
+    const newFilters = { ...filters, sort: value };
+    onUpdateFilters(newFilters);
   };
   
   // Loading state

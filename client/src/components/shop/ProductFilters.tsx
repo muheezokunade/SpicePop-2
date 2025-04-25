@@ -196,7 +196,17 @@ export default function ProductFilters({
             <h3 className="font-medium">Sort By</h3>
           </div>
           
-          <Select value={sortOption} onValueChange={setSortOption}>
+          <Select 
+            value={sortOption} 
+            onValueChange={(value) => {
+              setSortOption(value);
+              const newFilters = { ...initialFilters, sort: value };
+              if (value === 'name-asc') {
+                delete newFilters.sort;
+              }
+              onUpdateFilters(newFilters);
+            }}
+          >
             <SelectTrigger className="w-full border-gray-200">
               <SelectValue placeholder="Sort by" />
             </SelectTrigger>
