@@ -13,7 +13,7 @@ export function NewSpicePopLogo({
   height = 100, 
   variant = 'light' 
 }: NewSpicePopLogoProps) {
-  // Create SVG version of the logo that looks like the image
+  // Use a more accurate SVG version of the logo that looks like the image
   return (
     <svg 
       width={width} 
@@ -23,87 +23,84 @@ export function NewSpicePopLogo({
       xmlns="http://www.w3.org/2000/svg" 
       className={className}
     >
-      {/* Background */}
-      <rect width="500" height="500" fill={variant === 'dark' ? '#0F110C' : 'transparent'} />
+      {/* Background (optional based on variant) */}
+      {variant === 'dark' && <rect width="500" height="500" fill="#0F110C" />}
       
-      {/* Circle */}
+      {/* Circle outline */}
       <circle 
         cx="250" 
         cy="250" 
-        r="180" 
+        r="170" 
         fill="transparent" 
-        stroke={variant === 'dark' ? '#F5F0E1' : '#F5F0E1'} 
-        strokeWidth="8" 
+        stroke="#F5F0E1" 
+        strokeWidth="6" 
       />
       
-      {/* Text "Spice Pop" */}
+      {/* The word "Spice" with cursive styling */}
       <path 
-        d="M130,270 C125,260 125,240 140,230 C155,220 170,225 175,235 C177,240 177,250 172,255 C167,260 160,265 145,270 C160,278 175,290 170,310 C165,320 155,330 140,330 C125,330 115,320 115,300"
-        fill="transparent"
-        stroke={variant === 'dark' ? '#F5F0E1' : '#F5F0E1'}
-        strokeWidth="10"
+        d="M125,235 C125,205 160,205 170,220 C180,235 165,250 140,255 C160,260 185,280 175,310 C165,330 140,330 125,315"
+        fill="transparent" 
+        stroke="#F5F0E1" 
+        strokeWidth="8"
         strokeLinecap="round"
+        strokeLinejoin="round"
       />
       
       <path 
-        d="M175,230 C190,220 200,220 210,235 C215,250 210,290 205,320 C202,335 195,345 180,345"
-        fill="transparent"
-        stroke={variant === 'dark' ? '#F5F0E1' : '#F5F0E1'}
-        strokeWidth="10"
+        d="M190,230 C210,220 225,235 225,250 C225,295 200,345 185,345"
+        fill="transparent" 
+        stroke="#F5F0E1" 
+        strokeWidth="8"
         strokeLinecap="round"
+        strokeLinejoin="round"
       />
       
       <path 
-        d="M220,245 C225,235 235,230 250,230 C265,230 275,240 275,260 C275,280 265,290 240,290"
-        fill="transparent"
-        stroke={variant === 'dark' ? '#F5F0E1' : '#F5F0E1'}
-        strokeWidth="10"
+        d="M235,240 C245,225 265,220 275,240 C285,260 265,275 245,275 M260,320 L235,275"
+        fill="transparent" 
+        stroke="#F5F0E1" 
+        strokeWidth="8"
         strokeLinecap="round"
+        strokeLinejoin="round"
       />
       
       <path 
-        d="M260,340 L230,290"
-        fill="transparent"
-        stroke={variant === 'dark' ? '#F5F0E1' : '#F5F0E1'}
-        strokeWidth="10"
+        d="M290,230 C300,220 320,220 325,240 C330,260 320,290 300,315 C285,335 275,315 290,300"
+        fill="transparent" 
+        stroke="#F5F0E1" 
+        strokeWidth="8"
         strokeLinecap="round"
+        strokeLinejoin="round"
       />
       
+      {/* The word "Pop" with cursive styling */}
       <path 
-        d="M280,260 C285,240 305,230 320,245 C335,260 335,300 320,320 C305,340 290,335 280,320"
-        fill="transparent"
-        stroke={variant === 'dark' ? '#F5F0E1' : '#F5F0E1'}
-        strokeWidth="10"
+        d="M325,240 C335,225 360,225 365,240 C370,255 355,275 330,275 M355,320 L330,275"
+        fill="transparent" 
+        stroke="#F5F0E1" 
+        strokeWidth="8"
         strokeLinecap="round"
+        strokeLinejoin="round"
       />
       
       <path 
-        d="M330,245 C340,235 350,230 365,230 C380,230 390,240 390,260 C390,280 380,290 350,290"
-        fill="transparent"
-        stroke={variant === 'dark' ? '#F5F0E1' : '#F5F0E1'}
-        strokeWidth="10"
+        d="M375,230 C405,220 415,260 380,275 C410,290 395,340 365,330"
+        fill="transparent" 
+        stroke="#F5F0E1" 
+        strokeWidth="8"
         strokeLinecap="round"
+        strokeLinejoin="round"
       />
       
+      {/* Red Chili Pepper */}
       <path 
-        d="M375,340 L345,290"
-        fill="transparent"
-        stroke={variant === 'dark' ? '#F5F0E1' : '#F5F0E1'}
-        strokeWidth="10"
-        strokeLinecap="round"
+        d="M250,120 C230,130 230,150 240,175 C250,200 260,175 260,160 C260,145 245,130 250,120"
+        fill="#E94A30"
       />
       
-      {/* Chili Pepper */}
+      {/* Green Chili Stem */}
       <path 
-        d="M250,100 C210,130 215,180 240,190 C265,200 280,180 270,145 C260,110 240,180 260,190"
-        fill="#E94A30" 
-        stroke="#E94A30"
-        strokeWidth="2"
-      />
-      
-      {/* Chili Stem */}
-      <path 
-        d="M240,120 C245,100 260,90 280,110"
+        d="M245,125 C250,110 265,105 275,115"
         fill="#9CC25D"
         stroke="#9CC25D"
         strokeWidth="2"

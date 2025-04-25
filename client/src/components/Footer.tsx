@@ -20,7 +20,7 @@ import {
   SITE_NAME,
   FOUNDER 
 } from "@/lib/constants";
-import { SpicePopLogo } from "./SpicePopLogo";
+import { NewSpicePopLogo } from "./NewSpicePopLogo";
 
 export default function Footer() {
   return (
@@ -31,7 +31,7 @@ export default function Footer() {
           <div className="lg:col-span-2">
             <Link href="/">
               <a className="flex items-center gap-3 mb-6">
-                <SpicePopLogo width={48} height={48} />
+                <NewSpicePopLogo width={48} height={48} variant="light" />
                 <div>
                   <p className="font-semibold text-xl">{SITE_NAME}</p>
                   <p className="text-xs text-muted-foreground">Nigerian Spices & Foodstuffs</p>
