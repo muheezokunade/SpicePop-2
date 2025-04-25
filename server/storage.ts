@@ -267,11 +267,11 @@ export class MemStorage implements IStorage {
   // SEED DATA
   private seedCategories() {
     const categories: InsertCategory[] = [
-      { name: 'Spices', slug: 'spices', imageUrl: '/images/categories/spices.jpg' },
-      { name: 'Grains & Rice', slug: 'grains-rice', imageUrl: '/images/categories/grains.jpg' },
-      { name: 'Sauces & Pastes', slug: 'sauces-pastes', imageUrl: '/images/categories/sauces.jpg' },
-      { name: 'Snacks', slug: 'snacks', imageUrl: '/images/categories/snacks.jpg' },
-      { name: 'Recipe Bundles', slug: 'recipe-bundles', imageUrl: '/images/categories/bundles.jpg' }
+      { name: 'Spices', slug: 'spices', imageUrl: 'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=800&q=80' },
+      { name: 'Grains & Rice', slug: 'grains-rice', imageUrl: 'https://images.unsplash.com/photo-1586201375761-83865001e8d6?w=800&q=80' },
+      { name: 'Sauces & Pastes', slug: 'sauces-pastes', imageUrl: 'https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=800&q=80' },
+      { name: 'Snacks', slug: 'snacks', imageUrl: 'https://images.unsplash.com/photo-1566478989037-eec170784d0b?w=800&q=80' },
+      { name: 'Recipe Bundles', slug: 'recipe-bundles', imageUrl: 'https://images.unsplash.com/photo-1509358271058-acd22cc93898?w=800&q=80' }
     ];
     
     categories.forEach(async (category) => {
@@ -294,7 +294,7 @@ export class MemStorage implements IStorage {
         description: 'A perfect blend of scotch bonnet peppers and local spices for your soups and stews.',
         price: '1500',
         stock: 50,
-        imageUrl: '/images/products/pepper-mix.jpg',
+        imageUrl: 'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=800&q=80',
         categoryId: spicesCategoryId,
         isFeatured: true
       },
@@ -304,7 +304,7 @@ export class MemStorage implements IStorage {
         description: 'All the spices you need to make the perfect Nigerian Jollof rice in one convenient packet.',
         price: '2200',
         stock: 35,
-        imageUrl: '/images/products/jollof-spice.jpg',
+        imageUrl: 'https://images.unsplash.com/photo-1599438245301-173ce6a803c5?w=800&q=80',
         categoryId: spicesCategoryId,
         isFeatured: true
       },
@@ -314,7 +314,7 @@ export class MemStorage implements IStorage {
         description: 'High-quality ogbono seeds for making authentic Nigerian ogbono soup.',
         price: '3800',
         stock: 20,
-        imageUrl: '/images/products/ogbono.jpg',
+        imageUrl: 'https://images.unsplash.com/photo-1508747323945-2a6097fce5bd?w=800&q=80',
         categoryId: saucesCategoryId,
         isFeatured: true
       },
@@ -324,7 +324,7 @@ export class MemStorage implements IStorage {
         description: 'Essential ingredient for adding rich flavor to Nigerian soups and stews.',
         price: '2500',
         stock: 40,
-        imageUrl: '/images/products/crayfish.jpg',
+        imageUrl: 'https://images.unsplash.com/photo-1626082896492-766af4eb6501?w=800&q=80',
         categoryId: spicesCategoryId,
         isFeatured: true
       },
@@ -334,7 +334,7 @@ export class MemStorage implements IStorage {
         description: 'Premium local Nigerian rice with unique texture and flavor.',
         price: '3500',
         stock: 25,
-        imageUrl: '/images/products/ofada-rice.jpg',
+        imageUrl: 'https://images.unsplash.com/photo-1586201375761-83865001e8d6?w=800&q=80',
         categoryId: grainsCategoryId,
         isFeatured: false
       },
@@ -344,7 +344,7 @@ export class MemStorage implements IStorage {
         description: 'Ground melon seeds for making traditional egusi soup.',
         price: '2800',
         stock: 30,
-        imageUrl: '/images/products/egusi.jpg',
+        imageUrl: 'https://images.unsplash.com/photo-1556910633-5099dc3971e0?w=800&q=80',
         categoryId: saucesCategoryId,
         isFeatured: false
       },
@@ -354,7 +354,7 @@ export class MemStorage implements IStorage {
         description: 'Crunchy, lightly salted plantain chips made from fresh Nigerian plantains.',
         price: '1200',
         stock: 60,
-        imageUrl: '/images/products/plantain-chips.jpg',
+        imageUrl: 'https://images.unsplash.com/photo-1559471712-e29bb872c2fa?w=800&q=80',
         categoryId: snacksCategoryId,
         isFeatured: false
       },
@@ -364,7 +364,7 @@ export class MemStorage implements IStorage {
         description: 'Authentic spice blend for making traditional Nigerian suya at home.',
         price: '1800',
         stock: 45,
-        imageUrl: '/images/products/suya-spice.jpg',
+        imageUrl: 'https://images.unsplash.com/photo-1589881133595-a3c085cb731d?w=800&q=80',
         categoryId: spicesCategoryId,
         isFeatured: false
       }
