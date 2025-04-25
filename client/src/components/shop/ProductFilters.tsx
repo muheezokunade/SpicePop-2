@@ -274,7 +274,7 @@ export default function ProductFilters({
                       className="ml-1 h-3 w-3 cursor-pointer" 
                       onClick={() => {
                         setPriceRange([0, 10000]);
-                        const newFilters = { ...filters };
+                        const newFilters = { ...initialFilters };
                         delete newFilters.minPrice;
                         delete newFilters.maxPrice;
                         onUpdateFilters(newFilters);
@@ -298,7 +298,7 @@ export default function ProductFilters({
                       className="ml-1 h-3 w-3 cursor-pointer" 
                       onClick={() => {
                         setSortOption('name-asc');
-                        const newFilters = { ...filters };
+                        const newFilters = { ...initialFilters };
                         delete newFilters.sort;
                         onUpdateFilters(newFilters);
                       }}

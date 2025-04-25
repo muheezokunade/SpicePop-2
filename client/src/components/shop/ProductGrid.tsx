@@ -86,8 +86,30 @@ export default function ProductGrid({ filters }: ProductGridProps) {
   const handleMobileSortChange = (value: string) => {
     setMobileSort(value);
     const newFilters = { ...filters, sort: value };
-    // This is a hack to trigger the parent component to update the filters
-    document.dispatchEvent(new CustomEvent('updateFilters', { detail: newFilters }));
+    
+    // Use prop-based communication instead of custom events
+    onUpdateFilters && onUpdateFilters(newFilters);
+  };
+  
+  // Add a function to communicate with parent
+  const onUpdateFilters = (newFilters: Record<string, string>) => {
+    // Update URL with new filters
+    const searchParams = new URLSearchParams();
+    
+    Object.entries(newFilters).forEach(([key, value]) => {
+      if (value) {
+        searchParams.append(key, value);
+      }
+    });
+    
+    const searchString = searchParams.toString();
+    const newUrl = searchString ? `/shop?${searchString}` : '/shop';
+    
+    // Update URL without triggering a navigation
+    window.history.replaceState(null, '', newUrl);
+    
+    // This will trigger a re-render with updated filters
+    window.dispatchEvent(new Event('popstate'));
   };
   
   // Loading state

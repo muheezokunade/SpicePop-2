@@ -38,9 +38,10 @@ export default function ShopPage() {
     
     const initialFilters: Record<string, string> = {};
     
-    for (const [key, value] of searchParams.entries()) {
+    // Use forEach instead of for...of to avoid downlevelIteration issues
+    searchParams.forEach((value, key) => {
       initialFilters[key] = value;
-    }
+    });
     
     setFilters(initialFilters);
     
