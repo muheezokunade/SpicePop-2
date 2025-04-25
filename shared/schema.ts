@@ -67,6 +67,33 @@ export const settings = pgTable("settings", {
   value: text("value").notNull(),
 });
 
+// Blog Posts
+export const blogPosts = pgTable("blog_posts", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  title: text("title").notNull(),
+  slug: text("slug").notNull().unique(),
+  excerpt: text("excerpt").notNull(),
+  content: text("content").notNull(),
+  imageUrl: text("image_url"),
+  authorId: integer("author_id").references(() => users.id),
+  published: boolean("published").default(true).notNull(),
+  categoryId: uuid("category_id").references(() => categories.id),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// Define blog relations
+export const blogPostsRelations = relations(blogPosts, ({ one }) => ({
+  author: one(users, {
+    fields: [blogPosts.authorId],
+    references: [users.id]
+  }),
+  category: one(categories, {
+    fields: [blogPosts.categoryId],
+    references: [categories.id]
+  })
+}));
+
 // Create insert schemas
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true
@@ -90,6 +117,12 @@ export const insertSettingSchema = createInsertSchema(settings).omit({
   id: true
 });
 
+export const insertBlogPostSchema = createInsertSchema(blogPosts).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true
+});
+
 // Create types
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -105,6 +138,9 @@ export type InsertOrder = z.infer<typeof insertOrderSchema>;
 
 export type Setting = typeof settings.$inferSelect;
 export type InsertSetting = z.infer<typeof insertSettingSchema>;
+
+export type BlogPost = typeof blogPosts.$inferSelect;
+export type InsertBlogPost = z.infer<typeof insertBlogPostSchema>;
 
 // Additional custom types
 export type CartItem = {

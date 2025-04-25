@@ -12,11 +12,14 @@ import {
   Setting,
   InsertSetting,
   OrderStatus,
+  BlogPost,
+  InsertBlogPost,
   users,
   categories,
   products,
   orders,
   settings,
+  blogPosts,
 } from "@shared/schema";
 import { db } from './db';
 
@@ -55,6 +58,16 @@ export interface IStorage {
   getSettings(): Promise<Setting[]>;
   getSetting(key: string): Promise<Setting | undefined>;
   updateSetting(key: string, value: string): Promise<Setting>;
+  
+  // Blog operations
+  getBlogPosts(): Promise<BlogPost[]>;
+  getPublishedBlogPosts(): Promise<BlogPost[]>;
+  getBlogPost(id: string): Promise<BlogPost | undefined>;
+  getBlogPostBySlug(slug: string): Promise<BlogPost | undefined>;
+  getBlogPostsByCategory(categoryId: string): Promise<BlogPost[]>;
+  createBlogPost(post: InsertBlogPost): Promise<BlogPost>;
+  updateBlogPost(id: string, post: Partial<InsertBlogPost>): Promise<BlogPost | undefined>;
+  deleteBlogPost(id: string): Promise<boolean>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -215,6 +228,61 @@ export class DatabaseStorage implements IStorage {
         .returning();
       return result[0];
     }
+  }
+  
+  // BLOG POSTS
+  async getBlogPosts(): Promise<BlogPost[]> {
+    return db.select().from(blogPosts).orderBy(desc(blogPosts.createdAt));
+  }
+  
+  async getPublishedBlogPosts(): Promise<BlogPost[]> {
+    return db.select().from(blogPosts)
+      .where(eq(blogPosts.published, true))
+      .orderBy(desc(blogPosts.createdAt));
+  }
+  
+  async getBlogPost(id: string): Promise<BlogPost | undefined> {
+    const result = await db.select().from(blogPosts).where(eq(blogPosts.id, id));
+    return result[0];
+  }
+  
+  async getBlogPostBySlug(slug: string): Promise<BlogPost | undefined> {
+    const result = await db.select().from(blogPosts).where(eq(blogPosts.slug, slug));
+    return result[0];
+  }
+  
+  async getBlogPostsByCategory(categoryId: string): Promise<BlogPost[]> {
+    return db.select().from(blogPosts)
+      .where(and(
+        eq(blogPosts.categoryId, categoryId),
+        eq(blogPosts.published, true)
+      ))
+      .orderBy(desc(blogPosts.createdAt));
+  }
+  
+  async createBlogPost(insertBlogPost: InsertBlogPost): Promise<BlogPost> {
+    const result = await db.insert(blogPosts).values(insertBlogPost).returning();
+    return result[0];
+  }
+  
+  async updateBlogPost(id: string, blogPostUpdate: Partial<InsertBlogPost>): Promise<BlogPost | undefined> {
+    const result = await db
+      .update(blogPosts)
+      .set({
+        ...blogPostUpdate,
+        updatedAt: new Date()
+      })
+      .where(eq(blogPosts.id, id))
+      .returning();
+    return result[0];
+  }
+  
+  async deleteBlogPost(id: string): Promise<boolean> {
+    const result = await db
+      .delete(blogPosts)
+      .where(eq(blogPosts.id, id))
+      .returning();
+    return result.length > 0;
   }
   
   // Seed Data Methods
