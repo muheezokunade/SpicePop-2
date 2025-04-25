@@ -24,7 +24,7 @@ export default function HeroSection() {
             size="lg"
           >
             <Link href="/shop">
-              <a>Shop Now</a>
+              Shop Now
             </Link>
           </Button>
           
@@ -35,7 +35,7 @@ export default function HeroSection() {
             size="lg"
           >
             <Link href="/about">
-              <a>Learn More</a>
+              Learn More
             </Link>
           </Button>
         </div>

@@ -15,7 +15,8 @@ import {
   MapPin, 
   Phone, 
   Mail, 
-  MessageCircle 
+  MessageCircle,
+  Video
 } from 'lucide-react';
 
 export default function Footer() {
@@ -29,6 +30,8 @@ export default function Footer() {
         return <Instagram size={18} />;
       case 'twitter':
         return <Twitter size={18} />;
+      case 'tiktok':
+        return <Video size={18} />;
       case 'whatsapp':
         return <MessageCircle size={18} />;
       default:
@@ -68,10 +71,11 @@ export default function Footer() {
             <ul className="space-y-3">
               {FOOTER_LINKS.quickLinks.map(link => (
                 <li key={link.href}>
-                  <Link href={link.href}>
-                    <a className="text-cream/80 hover:text-secondary transition-colors">
-                      {link.label}
-                    </a>
+                  <Link 
+                    href={link.href}
+                    className="text-cream/80 hover:text-secondary transition-colors"
+                  >
+                    {link.label}
                   </Link>
                 </li>
               ))}
@@ -84,10 +88,11 @@ export default function Footer() {
             <ul className="space-y-3">
               {FOOTER_LINKS.categories.map(link => (
                 <li key={link.href}>
-                  <Link href={link.href}>
-                    <a className="text-cream/80 hover:text-secondary transition-colors">
-                      {link.label}
-                    </a>
+                  <Link 
+                    href={link.href}
+                    className="text-cream/80 hover:text-secondary transition-colors"
+                  >
+                    {link.label}
                   </Link>
                 </li>
               ))}
@@ -124,10 +129,12 @@ export default function Footer() {
           </p>
           <div className="flex space-x-6">
             {FOOTER_LINKS.legal.map(link => (
-              <Link key={link.href} href={link.href}>
-                <a className="text-cream/60 hover:text-cream text-sm">
-                  {link.label}
-                </a>
+              <Link 
+                key={link.href} 
+                href={link.href}
+                className="text-cream/60 hover:text-cream text-sm"
+              >
+                {link.label}
               </Link>
             ))}
           </div>
