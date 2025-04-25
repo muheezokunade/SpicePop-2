@@ -40,19 +40,19 @@ export default function Header() {
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between py-4">
             {/* Logo */}
-            <Link href="/">
-              <a className="flex items-center">
+            <Link href="/" className="flex items-center">
                 <Logo />
-              </a>
             </Link>
 
             {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center space-x-8">
               {MAIN_NAV_ITEMS.map(item => (
-                <Link key={item.href} href={item.href}>
-                  <a className={`font-medium hover:text-primary transition-colors ${location === item.href ? 'text-primary' : ''}`}>
-                    {item.label}
-                  </a>
+                <Link 
+                  key={item.href} 
+                  href={item.href} 
+                  className={`font-medium hover:text-primary transition-colors ${location === item.href ? 'text-primary' : ''}`}
+                >
+                  {item.label}
                 </Link>
               ))}
             </nav>
@@ -100,10 +100,12 @@ export default function Header() {
           <div className="bg-white shadow-md px-4 py-2 md:hidden">
             <nav className="flex flex-col space-y-3 py-3">
               {MAIN_NAV_ITEMS.map(item => (
-                <Link key={item.href} href={item.href}>
-                  <a className={`font-medium hover:text-primary transition-colors py-2 ${location === item.href ? 'text-primary' : ''}`}>
-                    {item.label}
-                  </a>
+                <Link 
+                  key={item.href} 
+                  href={item.href}
+                  className={`font-medium hover:text-primary transition-colors py-2 ${location === item.href ? 'text-primary' : ''}`}
+                >
+                  {item.label}
                 </Link>
               ))}
             </nav>

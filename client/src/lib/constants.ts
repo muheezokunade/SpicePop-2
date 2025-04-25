@@ -1,18 +1,28 @@
 // Website information
 export const SITE_NAME = 'SpicePop';
 export const SITE_DESCRIPTION = 'Nigerian Modern E-Commerce Platform for Spices and Foodstuffs';
+export const FOUNDER = 'Iman Fasasi';
 
 // Contact information
-export const CONTACT_EMAIL = 'hello@spicepop.ng';
-export const CONTACT_PHONE = '+234 123 456 7890';
-export const CONTACT_WHATSAPP = '+234 987 654 3210';
-export const CONTACT_ADDRESS = '123 Spice Market Street, Lagos, Nigeria';
+export const CONTACT_EMAIL = 'info@spicepop.net';
+export const CONTACT_PHONE = '+2348068989798';
+export const CONTACT_WHATSAPP = '+2348068989798';
+export const CONTACT_ADDRESS = '13, Signature estate Ikota, Lekki, Lagos, Nigeria';
+
+// Store locations
+export const STORE_LOCATIONS = [
+  '13, Signature estate Ikota, Lekki, Lagos, Nigeria',
+  '10, Yusuf street Oshodi, Lagos',
+  'Road 4, Plot B, Carlton Gate estate, Ibadan, Oyo State',
+  '7B, road 7b, Obafemi Awolowo University, Ile ife, Osun State'
+];
 
 // Social links
 export const SOCIAL_LINKS = {
-  facebook: 'https://facebook.com/spicepop',
-  instagram: 'https://instagram.com/spicepop',
-  twitter: 'https://twitter.com/spicepop',
+  facebook: 'https://www.facebook.com/share/18yaDEg6ck/',
+  instagram: 'https://www.instagram.com/thespicepop?igsh=M3k3cm51aTQ3NG4=',
+  twitter: 'https://x.com/thespicepop?t=UjxyaAgKbIrvzCH1gFmbuA&s=09',
+  tiktok: 'https://www.tiktok.com/@spicepop?_t=ZM-8vpWf36RRDB&_r=1',
   whatsapp: 'https://wa.me/2349876543210'
 };
 

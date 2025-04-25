@@ -105,7 +105,11 @@ export class MemStorage implements IStorage {
 
   async createUser(insertUser: InsertUser): Promise<User> {
     const id = this.nextUserId++;
-    const user: User = { ...insertUser, id };
+    const user: User = { 
+      ...insertUser, 
+      id,
+      isAdmin: insertUser.isAdmin || false 
+    };
     this.users.set(id, user);
     return user;
   }
@@ -127,7 +131,11 @@ export class MemStorage implements IStorage {
   
   async createCategory(insertCategory: InsertCategory): Promise<Category> {
     const id = uuidv4();
-    const category: Category = { ...insertCategory, id };
+    const category: Category = { 
+      ...insertCategory, 
+      id,
+      imageUrl: insertCategory.imageUrl || null
+    };
     this.categories.set(id, category);
     return category;
   }
@@ -177,7 +185,11 @@ export class MemStorage implements IStorage {
     const product: Product = { 
       ...insertProduct, 
       id, 
-      createdAt: new Date()
+      createdAt: new Date(),
+      imageUrl: insertProduct.imageUrl || null,
+      stock: insertProduct.stock || 0,
+      categoryId: insertProduct.categoryId || null,
+      isFeatured: insertProduct.isFeatured || false
     };
     this.products.set(id, product);
     return product;
@@ -366,13 +378,19 @@ export class MemStorage implements IStorage {
     const settings: { key: string, value: string }[] = [
       { key: 'site_name', value: 'SpicePop' },
       { key: 'site_description', value: 'Nigerian Modern E-Commerce Platform for Spices and Foodstuffs' },
-      { key: 'contact_email', value: 'hello@spicepop.ng' },
-      { key: 'contact_phone', value: '+234 123 456 7890' },
-      { key: 'contact_whatsapp', value: '+234 987 654 3210' },
-      { key: 'contact_address', value: '123 Spice Market Street, Lagos, Nigeria' },
-      { key: 'social_facebook', value: 'https://facebook.com/spicepop' },
-      { key: 'social_instagram', value: 'https://instagram.com/spicepop' },
-      { key: 'social_twitter', value: 'https://twitter.com/spicepop' }
+      { key: 'founder', value: 'Iman Fasasi' },
+      { key: 'contact_email', value: 'info@spicepop.net' },
+      { key: 'contact_phone', value: '+2348068989798' },
+      { key: 'contact_whatsapp', value: '+2348068989798' },
+      { key: 'contact_address', value: '13, Signature estate Ikota, Lekki, Lagos, Nigeria' },
+      { key: 'store_location_1', value: '13, Signature estate Ikota, Lekki, Lagos, Nigeria' },
+      { key: 'store_location_2', value: '10, Yusuf street Oshodi, Lagos' },
+      { key: 'store_location_3', value: 'Road 4, Plot B, Carlton Gate estate, Ibadan, Oyo State' },
+      { key: 'store_location_4', value: '7B, road 7b, Obafemi Awolowo University, Ile ife, Osun State' },
+      { key: 'social_facebook', value: 'https://www.facebook.com/share/18yaDEg6ck/' },
+      { key: 'social_instagram', value: 'https://www.instagram.com/thespicepop?igsh=M3k3cm51aTQ3NG4=' },
+      { key: 'social_twitter', value: 'https://x.com/thespicepop?t=UjxyaAgKbIrvzCH1gFmbuA&s=09' },
+      { key: 'social_tiktok', value: 'https://www.tiktok.com/@spicepop?_t=ZM-8vpWf36RRDB&_r=1' }
     ];
     
     settings.forEach(async ({ key, value }) => {
