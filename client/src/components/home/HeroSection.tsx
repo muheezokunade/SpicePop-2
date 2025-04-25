@@ -5,8 +5,20 @@ import { ArrowRight, ShoppingBag, Utensils, Star, TrendingUp } from 'lucide-reac
 export default function HeroSection() {
   return (
     <section className="relative overflow-hidden bg-cream min-h-[85vh] flex items-center">
+      {/* SpicePop Logo */}
+      <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-30 animate-pop">
+        <div className="bg-white py-3 px-8 rounded-2xl shadow-lg text-center">
+          <h1 className="font-poppins font-extrabold text-5xl md:text-6xl tracking-tight leading-none">
+            <span className="text-gradient">Spice</span>
+            <span className="text-dark">Pop</span>
+          </h1>
+          <p className="text-xs font-medium text-gray-500 mt-1">AUTHENTIC NIGERIAN CUISINE</p>
+          <div className="h-1 w-24 bg-primary mx-auto mt-1 rounded-full"></div>
+        </div>
+      </div>
+      
       {/* Left section with content */}
-      <div className="container mx-auto px-4 py-12 grid grid-cols-1 lg:grid-cols-2 gap-8 relative z-20">
+      <div className="container mx-auto px-4 py-12 grid grid-cols-1 lg:grid-cols-2 gap-8 relative z-20 mt-12">
         <div className="flex flex-col justify-center">
           <div className="inline-block bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-6">
             Premium Nigerian Spices & Foodstuffs
