@@ -3,7 +3,7 @@ import { Product } from '@shared/schema';
 import { Button } from '@/components/ui/button';
 import { Plus, Award, Eye, ShoppingCart } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { useCartActions } from '@/hooks/use-cart';
+import { useCart } from '@/lib/contexts/CartContext';
 import { formatCurrency, truncateText } from '@/lib/utils';
 import { cn } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -14,7 +14,7 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product, className }: ProductCardProps) {
-  const { handleAddToCart, isAddingToCart } = useCartActions();
+  const { handleAddToCart, isAddingToCart } = useCart();
   
   const isNewProduct = () => {
     const now = new Date();

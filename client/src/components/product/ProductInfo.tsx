@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { formatCurrency } from '@/lib/utils';
-import { useCartActions } from '@/hooks/use-cart';
+import { useCart } from '@/lib/contexts/CartContext';
 import { 
   ShoppingBag, 
   Minus, 
@@ -21,7 +21,7 @@ interface ProductInfoProps {
 
 export default function ProductInfo({ product }: ProductInfoProps) {
   const [quantity, setQuantity] = useState(1);
-  const { handleAddToCart, isAddingToCart } = useCartActions();
+  const { handleAddToCart, isAddingToCart } = useCart();
   
   const incrementQuantity = () => {
     setQuantity(prev => prev + 1);
@@ -142,7 +142,7 @@ export default function ProductInfo({ product }: ProductInfoProps) {
           className="flex items-center justify-center"
           onClick={() => {
             const message = `Hello, I'm interested in the ${product.name} (${formatCurrency(product.price)}). Can you provide more information?`;
-            window.open(`https://wa.me/2349876543210?text=${encodeURIComponent(message)}`, '_blank');
+            window.open(`https://wa.me/2348068989798?text=${encodeURIComponent(message)}`, '_blank');
           }}
         >
           <MessageCircle className="mr-2 h-5 w-5 text-green-600" />
