@@ -117,7 +117,10 @@ export default function ProductForm({ productId }: ProductFormProps) {
       return response.json();
     },
     onSuccess: () => {
+      // Invalidate all product-related queries
       queryClient.invalidateQueries({ queryKey: [API_ENDPOINTS.products.list] });
+      queryClient.invalidateQueries({ queryKey: [API_ENDPOINTS.products.featured] });
+      
       toast({
         title: 'Success',
         description: 'Product created successfully',
@@ -140,8 +143,13 @@ export default function ProductForm({ productId }: ProductFormProps) {
       return response.json();
     },
     onSuccess: () => {
+      // Invalidate regular product queries
       queryClient.invalidateQueries({ queryKey: [API_ENDPOINTS.products.list] });
       queryClient.invalidateQueries({ queryKey: [API_ENDPOINTS.products.detail(productId || '')] });
+      
+      // Important: Also invalidate featured products query to update the homepage
+      queryClient.invalidateQueries({ queryKey: [API_ENDPOINTS.products.featured] });
+      
       toast({
         title: 'Success',
         description: 'Product updated successfully',
