@@ -82,13 +82,19 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   // Handle logout
   const handleLogout = async () => {
     try {
-      await apiRequest('POST', '/api/auth/logout', {});
+      // Clear auth credentials
+      import('@/lib/queryClient').then(({ clearAuthCredentials }) => {
+        clearAuthCredentials();
+      });
       
+      // Clear query cache
       queryClient.clear();
+      
       toast({
         title: "Logged out",
         description: "You have been logged out successfully",
       });
+      
       setLocation('/admin/login');
     } catch (error) {
       toast({

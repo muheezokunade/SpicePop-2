@@ -52,6 +52,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: 'Invalid credentials' });
       }
       
+      // Set auth in header for future requests
+      res.setHeader('Authorization', `Basic ${Buffer.from(`${username}:${password}`).toString('base64')}`);
+      
+      // Don't send password back to client
+      const { password: _, ...userWithoutPassword } = user;
+      
+      res.json(userWithoutPassword);
+    } catch (error) {
+      res.status(500).json({ message: 'Server error' });
+    }
+  });
+  
+  // Check current authentication
+  router.get('/auth/check', async (req, res) => {
+    try {
+      const authHeader = req.headers.authorization;
+      
+      if (!authHeader || !authHeader.startsWith('Basic ')) {
+        return res.status(401).json({ message: 'Unauthorized' });
+      }
+      
+      // Decode credentials
+      const base64Credentials = authHeader.split(' ')[1];
+      const credentials = Buffer.from(base64Credentials, 'base64').toString('utf-8');
+      const [username, password] = credentials.split(':');
+      
+      if (!username || !password) {
+        return res.status(401).json({ message: 'Unauthorized' });
+      }
+      
+      // Check if valid admin user
+      const user = await storage.getUserByUsername(username);
+      
+      if (!user || user.password !== password || !user.isAdmin) {
+        return res.status(401).json({ message: 'Unauthorized' });
+      }
+      
       // Don't send password back to client
       const { password: _, ...userWithoutPassword } = user;
       

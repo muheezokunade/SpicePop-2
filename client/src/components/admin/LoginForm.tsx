@@ -53,6 +53,12 @@ export default function LoginForm() {
       const userData = await response.json();
       
       if (userData && userData.isAdmin) {
+        // Store credentials for future requests
+        import('@/lib/queryClient').then(({ setAuthCredentials }) => {
+          setAuthCredentials(data.username, data.password);
+        });
+        
+        // Set user data in query cache
         queryClient.setQueryData(['/api/auth/check'], userData);
         
         toast({
