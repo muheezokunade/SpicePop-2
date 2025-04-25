@@ -23,7 +23,7 @@ export const SOCIAL_LINKS = {
   instagram: 'https://www.instagram.com/thespicepop?igsh=M3k3cm51aTQ3NG4=',
   twitter: 'https://x.com/thespicepop?t=UjxyaAgKbIrvzCH1gFmbuA&s=09',
   tiktok: 'https://www.tiktok.com/@spicepop?_t=ZM-8vpWf36RRDB&_r=1',
-  whatsapp: 'https://wa.me/2349876543210'
+  whatsapp: 'https://wa.me/2348068989798'
 };
 
 // Navigation

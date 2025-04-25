@@ -1,120 +1,152 @@
-import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useParams, Link } from "wouter";
 import { Helmet } from "react-helmet-async";
-import { useRoute } from "wouter";
-import { CalendarIcon, ChevronRightIcon, HomeIcon, PenIcon } from "lucide-react";
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink } from "@/components/ui/breadcrumb";
-import { Separator } from "@/components/ui/separator";
-import Layout from "@/components/Layout";
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
+import { HomeIcon, Calendar, Tag, ArrowLeft } from "lucide-react";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 import Loading from "@/components/Loading";
+import { Badge } from "@/components/ui/badge";
 import { SITE_NAME } from "@/lib/constants";
-import { BlogPost } from "@shared/schema";
 import { formatDate } from "@/lib/utils";
-import { Link } from "wouter";
+import { BlogPost } from "@shared/schema";
 
 export default function BlogPostPage() {
-  const [match, params] = useRoute("/blog/:slug");
-  const slug = params?.slug;
-
+  const { slug } = useParams();
+  
   const { data: post, isLoading, error } = useQuery<BlogPost>({
-    queryKey: ['/api/blog', slug],
-    enabled: !!slug,
+    queryKey: [`/api/blog/${slug}`],
   });
-
-  // Scroll to top when post changes
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [slug]);
-
-  if (!match) {
-    return null;
-  }
-
+  
+  // For SEO and meta tags
+  const pageTitle = post ? `${post.title} | Blog | ${SITE_NAME}` : `Blog | ${SITE_NAME}`;
+  const pageDescription = post?.excerpt || "Explore articles about Nigerian spices, recipes, and cooking tips";
+  
   return (
-    <Layout>
-      <Helmet>
-        <title>{post?.title || "Blog Post"} | {SITE_NAME}</title>
-        <meta name="description" content={post?.excerpt || "Loading blog post..."} />
-      </Helmet>
-
-      <div className="container py-8 md:py-12">
-        <Breadcrumb className="mb-6">
-          <BreadcrumbItem>
-            <BreadcrumbLink href="/">
-              <HomeIcon className="h-4 w-4 mr-2" />
-              Home
-            </BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbItem>
-            <BreadcrumbLink href="/blog">
-              <ChevronRightIcon className="h-4 w-4 mr-2" />
-              Blog
-            </BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbItem>
-            <BreadcrumbLink href={`/blog/${slug}`} isCurrentPage>
-              <ChevronRightIcon className="h-4 w-4 mr-2" />
-              {post?.title || "Loading..."}
-            </BreadcrumbLink>
-          </BreadcrumbItem>
-        </Breadcrumb>
+    <div className="flex min-h-screen flex-col">
+      <Header />
+      <main className="flex-1">
+        <Helmet>
+          <title>{pageTitle}</title>
+          <meta name="description" content={pageDescription} />
+          {post?.imageUrl && <meta property="og:image" content={post.imageUrl} />}
+        </Helmet>
 
         {isLoading ? (
-          <Loading />
-        ) : error || !post ? (
-          <div className="flex flex-col items-center justify-center py-12 text-center">
-            <PenIcon className="h-12 w-12 text-muted-foreground mb-4" />
-            <h2 className="text-xl font-semibold">
-              {error ? "Error loading blog post" : "Blog post not found"}
-            </h2>
-            <p className="text-muted-foreground mt-2 mb-6">
-              {error ? "Please try again later" : "The post you're looking for doesn't exist"}
-            </p>
-            <Link href="/blog">
-              <a className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground ring-offset-background transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50">
-                Return to Blog
-              </a>
-            </Link>
+          <div className="container py-12">
+            <Loading />
+          </div>
+        ) : error ? (
+          <div className="container py-12">
+            <div className="flex flex-col items-center justify-center text-center">
+              <h2 className="text-xl font-semibold">Failed to load blog post</h2>
+              <p className="text-muted-foreground mt-2 mb-6">
+                The post you're looking for couldn't be found.
+              </p>
+              <Link href="/blog">
+                <a className="flex items-center text-primary hover:underline">
+                  <ArrowLeft className="h-4 w-4 mr-2" />
+                  Back to Blog
+                </a>
+              </Link>
+            </div>
+          </div>
+        ) : !post ? (
+          <div className="container py-12">
+            <div className="flex flex-col items-center justify-center text-center">
+              <h2 className="text-xl font-semibold">Blog post not found</h2>
+              <p className="text-muted-foreground mt-2 mb-6">
+                The post you're looking for doesn't exist or has been removed.
+              </p>
+              <Link href="/blog">
+                <a className="flex items-center text-primary hover:underline">
+                  <ArrowLeft className="h-4 w-4 mr-2" />
+                  Back to Blog
+                </a>
+              </Link>
+            </div>
           </div>
         ) : (
-          <div className="mx-auto max-w-3xl">
+          <>
+            {/* Featured Image */}
             {post.imageUrl && (
-              <div className="aspect-video w-full overflow-hidden rounded-lg mb-6">
+              <div className="w-full h-64 md:h-96 overflow-hidden">
                 <img 
                   src={post.imageUrl} 
                   alt={post.title} 
-                  className="h-full w-full object-cover"
+                  className="w-full h-full object-cover"
                 />
               </div>
             )}
             
-            <div className="mb-6">
-              <div className="flex items-center text-sm text-muted-foreground mb-2">
-                <CalendarIcon className="mr-1 h-4 w-4" />
-                <span>{formatDate(post.createdAt)}</span>
+            <div className="container py-8 md:py-12">
+              {/* Breadcrumb */}
+              <Breadcrumb className="mb-6">
+                <BreadcrumbItem>
+                  <BreadcrumbLink href="/">
+                    <HomeIcon className="h-4 w-4 mr-2" />
+                    Home
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbLink href="/blog">
+                    Blog
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbLink href={`/blog/${post.slug}`} isCurrentPage>
+                    {post.title}
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+              </Breadcrumb>
+              
+              {/* Post Header */}
+              <div className="mb-8">
+                <h1 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">
+                  {post.title}
+                </h1>
+                
+                <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
+                  <div className="flex items-center gap-1.5">
+                    <Calendar className="h-4 w-4" />
+                    <span>{formatDate(post.createdAt)}</span>
+                  </div>
+                  
+                  {post.categoryId && (
+                    <div className="flex items-center gap-1.5">
+                      <Tag className="h-4 w-4" />
+                      <Badge variant="secondary">
+                        {/* We would ideally fetch the category name here */}
+                        {post.categoryId}
+                      </Badge>
+                    </div>
+                  )}
+                </div>
               </div>
-              <h1 className="text-3xl md:text-4xl font-bold tracking-tight mb-2">
-                {post.title}
-              </h1>
-              {post.excerpt && (
-                <p className="text-xl text-muted-foreground">
-                  {post.excerpt}
-                </p>
-              )}
+              
+              {/* Post Content */}
+              <div className="prose prose-lg max-w-none">
+                {post.content.split('\n\n').map((paragraph, idx) => (
+                  <p key={idx}>{paragraph}</p>
+                ))}
+              </div>
+              
+              {/* Back to Blog Link */}
+              <div className="mt-12 pt-6 border-t">
+                <Link href="/blog">
+                  <a className="inline-flex items-center text-primary hover:underline">
+                    <ArrowLeft className="h-4 w-4 mr-2" />
+                    Back to Blog
+                  </a>
+                </Link>
+              </div>
             </div>
-            
-            <Separator className="mb-6" />
-            
-            <div className="prose prose-lg dark:prose-invert max-w-none">
-              <div 
-                dangerouslySetInnerHTML={{ 
-                  __html: post.content.replace(/\n/g, '<br />') 
-                }} 
-              />
-            </div>
-          </div>
+          </>
         )}
-      </div>
-    </Layout>
+      </main>
+      <Footer />
+    </div>
   );
 }
