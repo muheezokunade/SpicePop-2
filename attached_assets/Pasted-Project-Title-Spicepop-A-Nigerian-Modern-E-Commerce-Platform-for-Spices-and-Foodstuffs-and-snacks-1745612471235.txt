@@ -1,0 +1,184 @@
+Project Title:
+Spicepop – A Nigerian Modern E-Commerce Platform for Spices and Foodstuffs and snacks with a Dynamic Admin Dashboard
+
+🧱 Tech Stack (preferred)
+Frontend: Next.js (App Router), TailwindCSS, ShadCN UI
+
+Backend: Supabase (PostgreSQL, Auth, Storage)
+
+Auth: Supabase Auth (Email/password or magic link)
+
+Payments: Paystack (or Stripe if global)
+
+Hosting: Vercel (Frontend) + Supabase (Backend)
+
+🌐 Website Features (User-Facing)
+✅ Public Pages:
+Home Page
+
+Hero section with banner
+
+Featured products
+
+Category navigation
+
+Testimonials or reviews
+
+Shop Page
+
+Product grid
+
+Filters: price range, category, popularity
+
+Search bar
+
+Product Detail Page
+
+Product image gallery
+
+Name, description, benefits, stock status, price
+
+Add to Cart button
+
+Cart & Checkout
+
+Cart summary
+
+Quantity updates & remove buttons
+
+Address form
+
+Checkout with cart sent to WhatsApp
+
+About Page
+
+Brand story, origin, values
+
+Contact Page
+
+WhatsApp, email form, social links
+
+Optional
+
+Blog page with spice-related articles or recipes
+
+User login/signup for order tracking
+
+🛠 Admin Dashboard Features (Private)
+Accessible only to authorized admin via login.
+
+✅ Admin Pages:
+Login Page
+
+Email + password auth via Supabase
+
+Dashboard Overview
+
+Stats: Total orders, revenue, active products
+
+Product Manager
+
+Add/edit/delete products
+
+Upload images to Supabase Storage
+
+Assign categories and prices
+
+Category Manager
+
+Create/edit/delete product categories
+
+Order Manager
+
+View order list with status
+
+Mark orders as shipped or fulfilled
+
+Homepage Manager
+
+Update hero banner image/text
+
+Set featured products
+
+Blog Manager (optional)
+
+Create/edit/delete blog posts or spice facts
+
+Settings
+
+Update contact info, delivery policy, links
+
+Auth Guard
+
+Admin-only access protected by role/email
+
+🗃️ Database Schema (Supabase)
+products
+
+Field	Type
+id	UUID (Primary Key)
+name	Text
+description	Text
+price	Numeric
+category_id	Foreign Key (categories.id)
+image_url	Text
+stock	Integer
+is_featured	Boolean
+created_at	Timestamp
+categories
+
+Field	Type
+id	UUID
+name	Text
+orders
+
+Field	Type
+id	UUID
+customer_email	Text
+items	JSONB
+total_amount	Numeric
+status	Enum (pending, paid, shipped, delivered)
+created_at	Timestamp
+blog_posts (optional)
+
+Field	Type
+id	UUID
+title	Text
+content	Text
+cover_image	Text
+created_at	Timestamp
+🛡️ Auth & Admin Logic
+Use Supabase Auth for sign in
+
+Protect all /admin/* routes
+
+Restrict admin access based on user.email === "admin@spicepop.com" or add a roles table
+
+💸 Payment Integration
+Integrate Paystack for checkout
+
+Collect user info + cart data
+
+Redirect to Paystack
+
+Confirm payment via webhook or redirect
+
+Mark order as paid
+
+🎨 UI Styling
+Use TailwindCSS and ShadCN UI for modern, clean design
+
+Responsive across desktop, tablet, and mobile
+
+Use DaisyUI or Flowbite optionally for UI components
+
+📦 Deliverables
+Complete frontend and backend project (GitHub repo or zip)
+
+Supabase setup with tables, auth, and storage
+
+Admin dashboard (accessible via /admin)
+
+Deployed frontend on Vercel
+
+Setup guide (or walkthrough video) for managing content
