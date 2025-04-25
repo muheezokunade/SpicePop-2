@@ -24,29 +24,31 @@ export function ProductCard({ product, className }: ProductCardProps) {
   
   return (
     <div className={cn("bg-white rounded-lg overflow-hidden shadow hover:shadow-md transition-shadow", className)}>
-      <Link href={`/product/${product.id}`}>
-        <a className="block aspect-square overflow-hidden">
-          {product.imageUrl ? (
-            <img 
-              src={product.imageUrl} 
-              alt={product.name} 
-              className="w-full h-full object-cover hover:scale-105 transition-transform duration-300" 
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-400">
-              No Image
-            </div>
-          )}
-        </a>
+      <Link 
+        href={`/product/${product.id}`}
+        className="block aspect-square overflow-hidden"
+      >
+        {product.imageUrl ? (
+          <img 
+            src={product.imageUrl} 
+            alt={product.name} 
+            className="w-full h-full object-cover hover:scale-105 transition-transform duration-300" 
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-400">
+            No Image
+          </div>
+        )}
       </Link>
       
       <div className="p-4">
         <div className="flex justify-between items-start mb-2">
           <h3 className="font-medium text-lg">
-            <Link href={`/product/${product.id}`}>
-              <a className="hover:text-primary transition-colors">
-                {product.name}
-              </a>
+            <Link 
+              href={`/product/${product.id}`}
+              className="hover:text-primary transition-colors"
+            >
+              {product.name}
             </Link>
           </h3>
           

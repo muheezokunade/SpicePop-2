@@ -18,11 +18,12 @@ export default function FeaturedProducts() {
         <div className="container mx-auto px-4">
           <div className="flex justify-between items-center mb-8">
             <h2 className="font-poppins font-bold text-2xl md:text-3xl">Featured Products</h2>
-            <Link href="/shop">
-              <a className="text-primary hover:text-primary/80 font-medium flex items-center">
-                View All
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </a>
+            <Link 
+              href="/shop"
+              className="text-primary hover:text-primary/80 font-medium flex items-center"
+            >
+              View All
+              <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
           </div>
           
@@ -54,11 +55,12 @@ export default function FeaturedProducts() {
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center mb-8">
           <h2 className="font-poppins font-bold text-2xl md:text-3xl">Featured Products</h2>
-          <Link href="/shop">
-            <a className="text-primary hover:text-primary/80 font-medium flex items-center">
-              View All
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </a>
+          <Link 
+            href="/shop"
+            className="text-primary hover:text-primary/80 font-medium flex items-center"
+          >
+            View All
+            <ArrowRight className="ml-2 h-4 w-4" />
           </Link>
         </div>
         
