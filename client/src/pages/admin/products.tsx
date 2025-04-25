@@ -68,7 +68,10 @@ export default function AdminProductsPage() {
       await apiRequest('DELETE', API_ENDPOINTS.products.detail(id), {});
     },
     onSuccess: () => {
+      // Invalidate all product-related queries
       queryClient.invalidateQueries({ queryKey: [API_ENDPOINTS.products.list] });
+      queryClient.invalidateQueries({ queryKey: [API_ENDPOINTS.products.featured] });
+      
       toast({
         title: 'Product Deleted',
         description: 'The product has been deleted successfully.',
