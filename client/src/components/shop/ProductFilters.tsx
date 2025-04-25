@@ -205,12 +205,16 @@ export default function ProductFilters({
               if (value === 'name-asc') {
                 // Default sorting is name-asc, so no need to include it in filters
                 const { sort, ...rest } = newFilters;
-                Object.assign(newFilters, rest);
+                onUpdateFilters(rest);
               } else {
                 newFilters.sort = value;
+                onUpdateFilters(newFilters);
               }
               
-              onUpdateFilters(newFilters);
+              // Force a refresh to ensure the sort is applied
+              setTimeout(() => {
+                window.dispatchEvent(new Event('popstate'));
+              }, 10);
             }}
           >
             <SelectTrigger className="w-full border-gray-200">

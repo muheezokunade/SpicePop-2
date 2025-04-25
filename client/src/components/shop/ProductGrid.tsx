@@ -54,11 +54,11 @@ export default function ProductGrid({ filters }: ProductGridProps) {
     }
     
     // Apply sorting
-    if (filters.sort) {
+    // Default sorting is name-asc
+    if (!filters.sort || filters.sort === 'name-asc') {
+      result.sort((a, b) => a.name.localeCompare(b.name));
+    } else {
       switch(filters.sort) {
-        case 'name-asc':
-          result.sort((a, b) => a.name.localeCompare(b.name));
-          break;
         case 'name-desc':
           result.sort((a, b) => b.name.localeCompare(a.name));
           break;
