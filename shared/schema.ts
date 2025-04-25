@@ -1,4 +1,5 @@
 import { pgTable, text, serial, integer, boolean, numeric, timestamp, jsonb, uuid } from "drizzle-orm/pg-core";
+import { relations } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -32,6 +33,19 @@ export const products = pgTable("products", {
   isFeatured: boolean("is_featured").default(false).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
+
+// Define category relations
+export const categoriesRelations = relations(categories, ({ many }) => ({
+  products: many(products)
+}));
+
+// Define product relations
+export const productsRelations = relations(products, ({ one }) => ({
+  category: one(categories, {
+    fields: [products.categoryId],
+    references: [categories.id]
+  })
+}));
 
 // Orders
 export const orders = pgTable("orders", {
