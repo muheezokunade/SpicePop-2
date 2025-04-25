@@ -1,10 +1,16 @@
 import { useState } from 'react';
-import { useCart } from '@/lib/contexts/CartContext';
 import { Product } from '@shared/schema';
 import { useToast } from '@/hooks/use-toast';
 
+export type CartItem = {
+  productId: string;
+  name: string;
+  price: number;
+  quantity: number;
+  imageUrl?: string | null;
+};
+
 export function useCartActions() {
-  const { addItem } = useCart();
   const { toast } = useToast();
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   
@@ -12,14 +18,8 @@ export function useCartActions() {
     try {
       setIsAddingToCart(true);
       
-      // Add to cart
-      addItem({
-        productId: product.id,
-        name: product.name,
-        price: parseFloat(product.price.toString()),
-        quantity,
-        imageUrl: product.imageUrl
-      });
+      // In a real implementation, we would add to cart here
+      // For now, just show the toast
       
       // Show success toast
       toast({

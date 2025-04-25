@@ -107,6 +107,12 @@ export const API_ENDPOINTS = {
   settings: {
     list: '/api/settings',
     update: (key: string) => `/api/settings/${key}`
+  },
+  blog: {
+    list: '/api/blog',
+    all: '/api/blog/all',
+    byCategory: (categoryId: string) => `/api/blog/category/${categoryId}`,
+    detail: (slug: string) => `/api/blog/${slug}`
   }
 };
 

@@ -6,7 +6,8 @@ import {
   insertCategorySchema, 
   insertProductSchema, 
   insertOrderSchema,
-  insertUserSchema
+  insertUserSchema,
+  insertBlogPostSchema
 } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -299,6 +300,94 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const setting = await storage.updateSetting(req.params.key, value);
       res.json(setting);
+    } catch (error) {
+      res.status(500).json({ message: 'Server error' });
+    }
+  });
+
+  // Blog Posts
+  router.get('/blog', async (req, res) => {
+    try {
+      const posts = await storage.getPublishedBlogPosts();
+      res.json(posts);
+    } catch (error) {
+      res.status(500).json({ message: 'Server error' });
+    }
+  });
+
+  router.get('/blog/all', requireAuth, async (req, res) => {
+    try {
+      const posts = await storage.getBlogPosts();
+      res.json(posts);
+    } catch (error) {
+      res.status(500).json({ message: 'Server error' });
+    }
+  });
+  
+  router.get('/blog/category/:categoryId', async (req, res) => {
+    try {
+      const posts = await storage.getBlogPostsByCategory(req.params.categoryId);
+      res.json(posts);
+    } catch (error) {
+      res.status(500).json({ message: 'Server error' });
+    }
+  });
+
+  router.get('/blog/:slug', async (req, res) => {
+    try {
+      const post = await storage.getBlogPostBySlug(req.params.slug);
+      
+      if (!post) {
+        return res.status(404).json({ message: 'Blog post not found' });
+      }
+      
+      res.json(post);
+    } catch (error) {
+      res.status(500).json({ message: 'Server error' });
+    }
+  });
+  
+  router.post('/blog', requireAuth, async (req, res) => {
+    try {
+      const validatedData = insertBlogPostSchema.parse(req.body);
+      const post = await storage.createBlogPost(validatedData);
+      res.status(201).json(post);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: 'Invalid data', errors: error.errors });
+      }
+      res.status(500).json({ message: 'Server error' });
+    }
+  });
+  
+  router.put('/blog/:id', requireAuth, async (req, res) => {
+    try {
+      // Only validate fields that are provided
+      const data = insertBlogPostSchema.partial().parse(req.body);
+      const post = await storage.updateBlogPost(req.params.id, data);
+      
+      if (!post) {
+        return res.status(404).json({ message: 'Blog post not found' });
+      }
+      
+      res.json(post);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: 'Invalid data', errors: error.errors });
+      }
+      res.status(500).json({ message: 'Server error' });
+    }
+  });
+  
+  router.delete('/blog/:id', requireAuth, async (req, res) => {
+    try {
+      const result = await storage.deleteBlogPost(req.params.id);
+      
+      if (!result) {
+        return res.status(404).json({ message: 'Blog post not found' });
+      }
+      
+      res.status(204).end();
     } catch (error) {
       res.status(500).json({ message: 'Server error' });
     }

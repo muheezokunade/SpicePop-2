@@ -43,20 +43,20 @@ export default function Header() {
             <Link href="/" className="flex items-center">
                 <Logo />
             </Link>
-
+            
             {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center space-x-8">
               {MAIN_NAV_ITEMS.map(item => (
                 <Link 
                   key={item.href} 
-                  href={item.href} 
-                  className={`font-medium hover:text-primary transition-colors ${location === item.href ? 'text-primary' : ''}`}
+                  href={item.href}
+                  className={`text-sm font-medium hover:text-primary transition-colors ${location === item.href ? 'text-primary' : 'text-gray-700'}`}
                 >
                   {item.label}
                 </Link>
               ))}
             </nav>
-
+            
             {/* Actions */}
             <div className="flex items-center space-x-4">
               <Button variant="ghost" size="icon" aria-label="Search">

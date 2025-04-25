@@ -291,6 +291,7 @@ export class DatabaseStorage implements IStorage {
     await this.seedCategories();
     await this.seedProducts();
     await this.seedSettings();
+    await this.seedBlogPosts();
   }
   
   private async seedAdmin() {
@@ -445,6 +446,184 @@ export class DatabaseStorage implements IStorage {
       for (const { key, value } of settings) {
         await this.updateSetting(key, value);
       }
+    }
+  }
+
+  private async seedBlogPosts() {
+    try {
+      const existingPosts = await this.getBlogPosts();
+      if (existingPosts.length === 0) {
+        const admin = await this.getUserByUsername('admin');
+        if (!admin) {
+          return;
+        }
+
+        // Get category IDs
+        const categories = await this.getCategories();
+        const spicesCategoryId = categories.find(c => c.slug === 'spices')?.id || '';
+        const recipesCategoryId = categories.find(c => c.slug === 'recipe-bundles')?.id || '';
+        
+        const blogPosts: InsertBlogPost[] = [
+          {
+            title: "The Ultimate Guide to Nigerian Spices",
+            slug: "ultimate-guide-nigerian-spices",
+            excerpt: "Discover the rich flavors and health benefits of traditional Nigerian spices used in everyday cooking.",
+            content: `
+# The Ultimate Guide to Nigerian Spices
+
+Nigerian cuisine is renowned for its bold, aromatic flavors that come from a variety of indigenous spices and herbs. In this guide, we'll explore the most common Nigerian spices, their uses, and health benefits.
+
+## Essential Nigerian Spices
+
+### 1. Uda (Negro Pepper)
+Uda adds a pungent, aromatic flavor to soups and stews. It's often used in traditional pepper soup and is known for its medicinal properties that aid digestion.
+
+### 2. Uziza
+Both the leaves and seeds of uziza are used in Nigerian cooking. The seeds have a peppery, spicy flavor and are often used in soups like Nsala soup.
+
+### 3. Ehuru (Calabash Nutmeg)
+This spice resembles nutmeg but has a unique flavor that's slightly milder. It's commonly used in soups and stews from Eastern Nigeria.
+
+### 4. Iru (Locust Bean)
+Fermented locust beans (Iru) are used as a flavoring agent in many Nigerian dishes. It adds a deep, umami flavor to soups and stews.
+
+### 5. Cameroon Pepper
+This hot, smoky pepper is essential in Nigerian cooking, particularly in jollof rice and stews.
+
+## Health Benefits
+
+Most Nigerian spices offer numerous health benefits:
+- Anti-inflammatory properties
+- Antimicrobial effects
+- Digestive aid
+- Rich in antioxidants
+
+Visit our store to explore our curated selection of premium Nigerian spices!
+            `,
+            imageUrl: "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=800&q=80",
+            authorId: admin.id,
+            published: true,
+            categoryId: spicesCategoryId
+          },
+          {
+            title: "How to Make the Perfect Jollof Rice",
+            slug: "perfect-jollof-rice-recipe",
+            excerpt: "Learn the secrets to making the most delicious, perfectly cooked Nigerian jollof rice with this step-by-step guide.",
+            content: `
+# How to Make the Perfect Jollof Rice
+
+Jollof rice is arguably the most famous dish in West Africa, with Nigeria and Ghana constantly debating who makes it better (we know the answer to that!). Here's our foolproof recipe for making authentic Nigerian jollof rice.
+
+## Ingredients
+
+- 3 cups of long-grain parboiled rice
+- 8 large plum tomatoes
+- 2 red bell peppers
+- 3 scotch bonnet peppers (adjust to taste)
+- 2 medium onions
+- 1/3 cup vegetable oil
+- 2 tablespoons tomato paste
+- 3 cups chicken or vegetable stock
+- 1 teaspoon each of curry powder and dried thyme
+- 2 bay leaves
+- 1 teaspoon of our SpicePop Jollof Rice Spice Mix
+- Salt to taste
+
+## Instructions
+
+### 1. Prepare the Base
+Blend tomatoes, red bell peppers, scotch bonnet peppers, and one onion until smooth. Dice the remaining onion.
+
+### 2. Cook the Sauce
+- Heat oil in a large pot and sauté the diced onions until translucent.
+- Add tomato paste and fry for 2-3 minutes.
+- Pour in the blended mixture and cook on medium heat for 15-20 minutes until reduced by half.
+- Add curry powder, thyme, bay leaves, and SpicePop Jollof Rice Spice Mix.
+
+### 3. Add Rice
+- Wash rice until water runs clear, then add to the pot.
+- Add stock, stir well, and cover with foil and a tight-fitting lid.
+- Reduce heat to low and simmer for 30 minutes.
+- After 30 minutes, stir gently, add more stock if needed, and cook for another 15 minutes.
+
+### 4. The Party Trick
+For that authentic smoky flavor, increase the heat for the last 3-5 minutes to allow the bottom layer to create that beloved crust (but don't burn it!).
+
+Serve with plantains, grilled chicken, or fish for a complete Nigerian feast!
+
+Visit our shop to purchase our special Jollof Rice Spice Mix that makes this recipe even more flavorful!
+            `,
+            imageUrl: "https://images.unsplash.com/photo-1644213410192-74d9b29df7e8?w=800&q=80",
+            authorId: admin.id,
+            published: true,
+            categoryId: recipesCategoryId
+          },
+          {
+            title: "Health Benefits of Nigerian Superfoods",
+            slug: "health-benefits-nigerian-superfoods",
+            excerpt: "Explore the nutritional powerhouses found in traditional Nigerian cuisine and how they can improve your health.",
+            content: `
+# Health Benefits of Nigerian Superfoods
+
+Nigerian cuisine isn't just delicious—it's packed with nutritious superfoods that have been used for generations. Here's why you should incorporate these traditional Nigerian foods into your diet.
+
+## Top Nigerian Superfoods
+
+### 1. Egusi Seeds
+These melon seeds are rich in protein, healthy fats, and essential minerals. When ground, they create a thick, creamy base for soups that's both nutritious and satisfying.
+
+**Benefits:**
+- High protein content
+- Rich in zinc and magnesium
+- Good source of healthy fats
+
+### 2. Bitter Leaf (Vernonia)
+This leafy vegetable has a distinctive bitter taste that mellows with cooking. It's a staple in many Nigerian soups.
+
+**Benefits:**
+- Natural detoxifier
+- Anti-inflammatory properties
+- May help regulate blood sugar
+
+### 3. Uda (Negro Pepper)
+Beyond its culinary uses, Uda is valued for its medicinal properties.
+
+**Benefits:**
+- Supports digestive health
+- Anti-microbial properties
+- Used traditionally for respiratory conditions
+
+### 4. Ogbono Seeds
+These seeds (from African bush mango) are used to make a popular Nigerian soup and have impressive nutritional benefits.
+
+**Benefits:**
+- Weight management support
+- Cholesterol-lowering properties
+- High in fiber
+
+### 5. Tiger Nuts (Ofio)
+These small tubers are used to make a refreshing drink called "Kunun Aya" and are packed with nutrients.
+
+**Benefits:**
+- Prebiotic properties for gut health
+- Rich in vitamin E and magnesium
+- Heart-healthy fats
+
+Visit our store to explore our selection of these traditional Nigerian superfoods and elevate both your cooking and your health!
+            `,
+            imageUrl: "https://images.unsplash.com/photo-1579113800032-c38bd7635818?w=800&q=80",
+            authorId: admin.id,
+            published: true,
+            categoryId: spicesCategoryId
+          }
+        ];
+
+        for (const post of blogPosts) {
+          await this.createBlogPost(post);
+        }
+      }
+    } catch (error) {
+      console.error("Error seeding blog posts:", error);
     }
   }
 }

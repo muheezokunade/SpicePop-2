@@ -1,140 +1,122 @@
 import { Link } from 'wouter';
 import { Logo } from '@/components/Logo';
 import { 
-  FOOTER_LINKS, 
-  SOCIAL_LINKS, 
-  CONTACT_EMAIL, 
-  CONTACT_PHONE, 
-  CONTACT_WHATSAPP, 
-  CONTACT_ADDRESS 
-} from '@/lib/constants';
-import { 
   Facebook, 
   Instagram, 
-  Twitter, 
-  MapPin, 
-  Phone, 
-  Mail, 
-  MessageCircle,
-  Video
+  Twitter,
+  MapPin,
+  Mail,
+  Phone
 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { FOOTER_LINKS, CONTACT_EMAIL, CONTACT_PHONE, CONTACT_ADDRESS } from '@/lib/constants';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
   
-  const renderSocialIcon = (platform: string) => {
-    switch (platform) {
-      case 'facebook':
-        return <Facebook size={18} />;
-      case 'instagram':
-        return <Instagram size={18} />;
-      case 'twitter':
-        return <Twitter size={18} />;
-      case 'tiktok':
-        return <Video size={18} />;
-      case 'whatsapp':
-        return <MessageCircle size={18} />;
-      default:
-        return null;
-    }
-  };
-  
   return (
-    <footer className="bg-dark text-cream pt-16 pb-8">
-      <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
-          {/* Brand section */}
-          <div>
-            <Logo variant="footer" className="mb-6" />
-            <p className="opacity-80 mb-4">
-              Bringing authentic Nigerian flavors to your kitchen with premium quality spices and foodstuffs.
+    <footer className="bg-gray-100 border-t">
+      <div className="container px-4 py-12 mx-auto">
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+          {/* Logo and About */}
+          <div className="space-y-4">
+            <Link href="/">
+              <a className="inline-block">
+                <Logo />
+              </a>
+            </Link>
+            <p className="text-sm text-gray-600">
+              Premium Nigerian spices and foodstuffs. 
+              We source directly from local farmers to bring 
+              you the most authentic flavors.
             </p>
             <div className="flex space-x-4">
-              {Object.entries(SOCIAL_LINKS).map(([platform, url]) => (
-                <a 
-                  key={platform}
-                  href={url} 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
-                  className="text-cream hover:text-secondary transition-colors" 
-                  aria-label={platform}
-                >
-                  {renderSocialIcon(platform)}
-                </a>
-              ))}
+              <a href="#" className="text-gray-500 hover:text-primary transition-colors">
+                <Facebook className="h-5 w-5" />
+              </a>
+              <a href="#" className="text-gray-500 hover:text-primary transition-colors">
+                <Instagram className="h-5 w-5" />
+              </a>
+              <a href="#" className="text-gray-500 hover:text-primary transition-colors">
+                <Twitter className="h-5 w-5" />
+              </a>
             </div>
           </div>
           
-          {/* Quick links */}
+          {/* Quick Links */}
           <div>
-            <h3 className="font-poppins font-semibold text-lg mb-4">Quick Links</h3>
-            <ul className="space-y-3">
+            <h3 className="font-medium text-lg mb-4">Quick Links</h3>
+            <ul className="space-y-2">
               {FOOTER_LINKS.quickLinks.map(link => (
                 <li key={link.href}>
-                  <Link 
-                    href={link.href}
-                    className="text-cream/80 hover:text-secondary transition-colors"
-                  >
-                    {link.label}
+                  <Link href={link.href}>
+                    <a className="text-gray-600 hover:text-primary transition-colors text-sm">
+                      {link.label}
+                    </a>
                   </Link>
                 </li>
               ))}
             </ul>
           </div>
           
-          {/* Categories */}
+          {/* Contact */}
           <div>
-            <h3 className="font-poppins font-semibold text-lg mb-4">Categories</h3>
+            <h3 className="font-medium text-lg mb-4">Contact Us</h3>
             <ul className="space-y-3">
-              {FOOTER_LINKS.categories.map(link => (
-                <li key={link.href}>
-                  <Link 
-                    href={link.href}
-                    className="text-cream/80 hover:text-secondary transition-colors"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
+              <li className="flex items-start space-x-3">
+                <MapPin className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+                <span className="text-sm text-gray-600">{CONTACT_ADDRESS}</span>
+              </li>
+              <li className="flex items-center space-x-3">
+                <Phone className="h-5 w-5 text-primary shrink-0" />
+                <a 
+                  href={`tel:${CONTACT_PHONE}`} 
+                  className="text-sm text-gray-600 hover:text-primary transition-colors"
+                >
+                  {CONTACT_PHONE}
+                </a>
+              </li>
+              <li className="flex items-center space-x-3">
+                <Mail className="h-5 w-5 text-primary shrink-0" />
+                <a 
+                  href={`mailto:${CONTACT_EMAIL}`} 
+                  className="text-sm text-gray-600 hover:text-primary transition-colors"
+                >
+                  {CONTACT_EMAIL}
+                </a>
+              </li>
             </ul>
           </div>
           
-          {/* Contact info */}
+          {/* Newsletter */}
           <div>
-            <h3 className="font-poppins font-semibold text-lg mb-4">Contact Us</h3>
-            <ul className="space-y-3">
-              <li className="flex items-start">
-                <MapPin className="mt-1 mr-3 text-secondary" size={18} />
-                <span className="text-cream/80">{CONTACT_ADDRESS}</span>
-              </li>
-              <li className="flex items-center">
-                <Phone className="mr-3 text-secondary" size={18} />
-                <span className="text-cream/80">{CONTACT_PHONE}</span>
-              </li>
-              <li className="flex items-center">
-                <Mail className="mr-3 text-secondary" size={18} />
-                <span className="text-cream/80">{CONTACT_EMAIL}</span>
-              </li>
-              <li className="flex items-center">
-                <MessageCircle className="mr-3 text-secondary" size={18} />
-                <span className="text-cream/80">{CONTACT_WHATSAPP}</span>
-              </li>
-            </ul>
+            <h3 className="font-medium text-lg mb-4">Newsletter</h3>
+            <p className="text-sm text-gray-600 mb-4">
+              Subscribe to our newsletter for exclusive deals and spice tips.
+            </p>
+            <div className="flex space-x-2">
+              <Input 
+                type="email" 
+                placeholder="Your email" 
+                className="bg-white" 
+              />
+              <Button>Subscribe</Button>
+            </div>
           </div>
         </div>
         
-        <div className="pt-8 border-t border-cream/20 flex flex-col md:flex-row justify-between items-center">
-          <p className="text-cream/60 text-sm mb-4 md:mb-0">
-            &copy; {currentYear} SpicePop. All rights reserved.
+        <div className="border-t border-gray-200 mt-10 pt-6 flex flex-col md:flex-row justify-between items-center">
+          <p className="text-sm text-gray-500">
+            © {currentYear} SpicePop. All rights reserved.
           </p>
-          <div className="flex space-x-6">
+          
+          <div className="flex space-x-6 mt-4 md:mt-0">
             {FOOTER_LINKS.legal.map(link => (
-              <Link 
-                key={link.href} 
-                href={link.href}
-                className="text-cream/60 hover:text-cream text-sm"
-              >
-                {link.label}
+              <Link key={link.href} href={link.href}>
+                <a className="text-xs text-gray-500 hover:text-primary transition-colors">
+                  {link.label}
+                </a>
               </Link>
             ))}
           </div>
