@@ -445,8 +445,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // SEO files routes (sitemap and robots.txt)
+  router.get('/sitemap.xml', (req, res) => {
+    res.sendFile('sitemap.xml', { root: './public' });
+  });
+  
+  router.get('/robots.txt', (req, res) => {
+    res.sendFile('robots.txt', { root: './public' });
+  });
+  
   // Register routes
   app.use('/api', router);
+
+  // Also add root-level routes for SEO files
+  app.get('/sitemap.xml', (req, res) => {
+    res.sendFile('sitemap.xml', { root: './public' });
+  });
+  
+  app.get('/robots.txt', (req, res) => {
+    res.sendFile('robots.txt', { root: './public' });
+  });
 
   const httpServer = createServer(app);
   return httpServer;
