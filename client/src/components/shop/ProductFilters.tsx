@@ -40,17 +40,33 @@ export default function ProductFilters({
 }: ProductFiltersProps) {
   const [, setLocation] = useLocation();
   const [searchTerm, setSearchTerm] = useState(initialFilters.search || '');
-  // Initialize with the category from initialFilters - could be an ID or a slug
-  const [selectedCategory, setSelectedCategory] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState(initialFilters.category || '');
   const [priceRange, setPriceRange] = useState<number[]>([
     parseInt(initialFilters.minPrice || '0'), 
     parseInt(initialFilters.maxPrice || '10000')
   ]);
   const [sortOption, setSortOption] = useState(initialFilters.sort || 'name-asc');
   
+  // Get categories
   const { data: categories, isLoading: isLoadingCategories } = useQuery<Category[]>({
     queryKey: [API_ENDPOINTS.categories.list],
   });
+  
+  // Handle category slug->id conversion if needed
+  useEffect(() => {
+    if (initialFilters.category && categories) {
+      // Check if it could be a category slug
+      if (!initialFilters.category.includes('-')) {
+        return; // If it doesn't contain hyphens, likely not a slug format
+      }
+      
+      const categoryBySlug = categories.find(c => c.slug === initialFilters.category);
+      if (categoryBySlug) {
+        // If found by slug, update the selected category to use the ID instead
+        setSelectedCategory(categoryBySlug.id);
+      }
+    }
+  }, [initialFilters.category, categories]);
   
   // Apply filters
   const applyFilters = () => {
