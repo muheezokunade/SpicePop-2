@@ -15,7 +15,7 @@ export default function CategorySection() {
     return (
       <section className="py-20 bg-white">
         <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
             <div>
               <h2 className="font-poppins font-bold text-3xl md:text-4xl text-dark mb-2">
                 <Skeleton className="h-10 w-40" />
@@ -26,6 +26,15 @@ export default function CategorySection() {
             </div>
             <div className="mt-4 md:mt-0">
               <Skeleton className="h-10 w-32" />
+            </div>
+          </div>
+          
+          {/* Mobile category browsing skeleton */}
+          <div className="mb-8 overflow-x-auto no-scrollbar pb-2">
+            <div className="flex space-x-3">
+              {[...Array(5)].map((_, i) => (
+                <Skeleton key={i} className="h-10 w-24 rounded-full" />
+              ))}
             </div>
           </div>
           
@@ -56,7 +65,7 @@ export default function CategorySection() {
   return (
     <section className="py-20 bg-white">
       <div className="container mx-auto px-4">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
           <div>
             <h2 className="font-poppins font-bold text-3xl md:text-4xl text-dark mb-2">
               Explore Our Categories
@@ -69,6 +78,24 @@ export default function CategorySection() {
             View All Categories
             <ArrowRight size={16} />
           </Link>
+        </div>
+        
+        {/* Mobile category browsing */}
+        <div className="mb-8 overflow-x-auto no-scrollbar pb-2">
+          <div className="flex space-x-3 w-max">
+            <Link href="/shop" className="inline-block rounded-full bg-primary/10 text-primary px-4 py-2 text-sm font-medium hover:bg-primary/20 transition whitespace-nowrap">
+              All Products
+            </Link>
+            {categories.map(category => (
+              <Link 
+                key={category.id} 
+                href={`/shop?category=${category.slug}`}
+                className="inline-block rounded-full bg-gray-100 text-gray-800 px-4 py-2 text-sm font-medium hover:bg-gray-200 transition whitespace-nowrap"
+              >
+                {category.name}
+              </Link>
+            ))}
+          </div>
         </div>
         
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">

@@ -164,28 +164,30 @@ export default function ShopPage() {
             </div>
             
             {/* Category Tabs */}
-            <div className="mb-8 overflow-x-auto scrollbar-hide">
+            <div className="mb-8">
               <Tabs 
                 defaultValue="all" 
                 value={activeTab}
                 onValueChange={handleTabChange}
                 className="w-full"
               >
-                <TabsList className="mb-6 h-12 bg-background/80 backdrop-blur-sm">
-                  <TabsTrigger value="all" className="h-10 px-6">
-                    All Products
-                  </TabsTrigger>
-                  
-                  {categories?.map(category => (
-                    <TabsTrigger 
-                      key={category.slug} 
-                      value={category.slug}
-                      className="h-10 px-6"
-                    >
-                      {category.name}
+                <div className="overflow-x-auto py-1 no-scrollbar">
+                  <TabsList className="mb-6 h-12 bg-background/80 backdrop-blur-sm w-auto inline-flex whitespace-nowrap">
+                    <TabsTrigger value="all" className="h-10 px-4 sm:px-6 rounded-full">
+                      All Products
                     </TabsTrigger>
-                  ))}
-                </TabsList>
+                    
+                    {categories?.map(category => (
+                      <TabsTrigger 
+                        key={category.slug} 
+                        value={category.slug}
+                        className="h-10 px-4 sm:px-6 rounded-full mx-1"
+                      >
+                        {category.name}
+                      </TabsTrigger>
+                    ))}
+                  </TabsList>
+                </div>
                 
                 <div className="flex justify-between items-center mb-6">
                   <h2 className="text-2xl font-bold font-poppins">
