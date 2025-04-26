@@ -107,11 +107,11 @@ export default function ShopPage() {
       const newFilters = { ...filters };
       delete newFilters.category;
       handleUpdateFilters(newFilters);
-    } else if (categories) {
-      const category = categories.find(c => c.slug === value);
-      if (category) {
-        handleCategoryChange(category.id);
-      }
+    } else {
+      // Use the slug directly instead of converting to ID
+      const newFilters = { ...filters };
+      newFilters.category = value; // This is the slug
+      handleUpdateFilters(newFilters);
     }
   };
   

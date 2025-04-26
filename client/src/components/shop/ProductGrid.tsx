@@ -40,9 +40,11 @@ export default function ProductGrid({ filters }: ProductGridProps) {
       if (categoryBySlug) {
         // If found by slug, filter by categoryId
         result = result.filter(product => product.categoryId === categoryBySlug.id);
+        console.log(`Filtering by category slug: ${filters.category}, found ID: ${categoryBySlug.id}, products: ${result.length}`);
       } else {
         // Fall back to filtering by category ID
         result = result.filter(product => product.categoryId === filters.category);
+        console.log(`Filtering by category ID: ${filters.category}, products: ${result.length}`);
       }
     }
     
