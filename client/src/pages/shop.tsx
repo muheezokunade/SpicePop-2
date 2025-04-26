@@ -58,6 +58,7 @@ export default function ShopPage() {
   
   // Update URL with filters
   const handleUpdateFilters = (newFilters: Record<string, string>) => {
+    // Set state with the new filters
     setFilters(newFilters);
     
     // Convert filters to URL search params
@@ -74,6 +75,9 @@ export default function ShopPage() {
     
     // Update URL without triggering a navigation
     window.history.replaceState(null, '', newUrl);
+    
+    // Dispatch a popstate event to trigger a re-render with updated filters
+    window.dispatchEvent(new Event('popstate'));
   };
   
   const handleCategoryChange = (categoryId: string) => {

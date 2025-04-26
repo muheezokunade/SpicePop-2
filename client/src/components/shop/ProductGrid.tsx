@@ -105,21 +105,21 @@ export default function ProductGrid({ filters }: ProductGridProps) {
 
   // Handle sort change
   const handleMobileSortChange = (value: string) => {
+    // Update the local state 
     setMobileSort(value);
+    
+    // Create a fresh copy of the filters
     const newFilters = { ...filters };
     
+    // Handle default sort
     if (value === 'name-asc') {
       delete newFilters.sort;
     } else {
       newFilters.sort = value;
     }
     
+    // Update the filters through the URL
     onUpdateFilters(newFilters);
-    
-    // Force a page refresh to apply the sort
-    setTimeout(() => {
-      window.dispatchEvent(new Event('popstate'));
-    }, 10);
   };
   
   // Loading state

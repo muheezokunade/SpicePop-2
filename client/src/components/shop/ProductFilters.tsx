@@ -199,22 +199,23 @@ export default function ProductFilters({
           <Select 
             value={sortOption} 
             onValueChange={(value) => {
+              // Update local state
               setSortOption(value);
-              const newFilters = { ...initialFilters };
               
+              // Create a fresh copy of filters
+              const newFilters = {...initialFilters};
+              
+              // Handle default sort option
               if (value === 'name-asc') {
-                // Default sorting is name-asc, so no need to include it in filters
-                const { sort, ...rest } = newFilters;
-                onUpdateFilters(rest);
+                // Remove sort from filters if it's the default
+                delete newFilters.sort;
               } else {
+                // Set the new sort value
                 newFilters.sort = value;
-                onUpdateFilters(newFilters);
               }
               
-              // Force a refresh to ensure the sort is applied
-              setTimeout(() => {
-                window.dispatchEvent(new Event('popstate'));
-              }, 10);
+              // Update filters through parent component
+              onUpdateFilters(newFilters);
             }}
           >
             <SelectTrigger className="w-full border-gray-200">
