@@ -151,10 +151,8 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         `}
       >
         <div className="p-6">
-          <Link href="/admin">
-            <a className="flex items-center">
-              <Logo variant="footer" size="sm" />
-            </a>
+          <Link href="/admin" className="flex items-center">
+            <Logo variant="footer" size="sm" />
           </Link>
         </div>
         
@@ -166,16 +164,13 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
               <Link 
                 key={item.href} 
                 href={item.href}
+                className={`
+                  flex items-center px-3 py-2 rounded-md text-sm font-medium
+                  ${location === item.href ? 'bg-primary/80 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white'}
+                `}
               >
-                <a 
-                  className={`
-                    flex items-center px-3 py-2 rounded-md text-sm font-medium
-                    ${location === item.href ? 'bg-primary/80 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white'}
-                  `}
-                >
-                  {getNavIcon(item.icon)}
-                  <span className="ml-3">{item.label}</span>
-                </a>
+                {getNavIcon(item.icon)}
+                <span className="ml-3">{item.label}</span>
               </Link>
             ))}
           </div>

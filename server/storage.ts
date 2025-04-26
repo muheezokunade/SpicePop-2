@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { eq, and, like, desc, asc } from 'drizzle-orm';
+import { eq, and, like, desc, asc, isNull } from 'drizzle-orm';
 import {
   User,
   InsertUser,
@@ -122,10 +122,24 @@ export class DatabaseStorage implements IStorage {
   }
   
   async deleteCategory(id: string): Promise<boolean> {
+    // First, update any products that reference this category by setting categoryId to null
+    await db
+      .update(products)
+      .set({ categoryId: null })
+      .where(eq(products.categoryId, id));
+    
+    // Then, update any blog posts that reference this category by setting categoryId to null
+    await db
+      .update(blogPosts)
+      .set({ categoryId: null })
+      .where(eq(blogPosts.categoryId, id));
+    
+    // Now it's safe to delete the category
     const result = await db
       .delete(categories)
       .where(eq(categories.id, id))
       .returning();
+      
     return result.length > 0;
   }
   
