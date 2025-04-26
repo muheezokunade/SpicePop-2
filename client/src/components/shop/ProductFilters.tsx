@@ -55,15 +55,15 @@ export default function ProductFilters({
   // Handle category slug->id conversion if needed
   useEffect(() => {
     if (initialFilters.category && categories) {
-      // Check if it could be a category slug
-      if (!initialFilters.category.includes('-')) {
-        return; // If it doesn't contain hyphens, likely not a slug format
-      }
-      
+      // Try to find category by slug first
       const categoryBySlug = categories.find(c => c.slug === initialFilters.category);
+      
       if (categoryBySlug) {
-        // If found by slug, update the selected category to use the ID instead
-        setSelectedCategory(categoryBySlug.id);
+        // If found by slug, update the selected category to use the slug
+        setSelectedCategory(initialFilters.category);
+      } else {
+        // If not found by slug, it might be an ID, so keep it as is
+        setSelectedCategory(initialFilters.category);
       }
     }
   }, [initialFilters.category, categories]);
@@ -157,7 +157,7 @@ export default function ProductFilters({
                 
                 {categories?.map(category => (
                   <div key={category.id} className="flex items-center space-x-2">
-                    <RadioGroupItem value={category.id} id={`category-${category.id}`} />
+                    <RadioGroupItem value={category.slug} id={`category-${category.id}`} />
                     <Label htmlFor={`category-${category.id}`} className="text-sm cursor-pointer">
                       {category.name}
                     </Label>
@@ -289,7 +289,12 @@ export default function ProductFilters({
                     variant="outline" 
                     className="bg-gray-100 text-gray-700 hover:bg-gray-200 px-2.5 py-1"
                   >
-                    Category: {categories.find(c => c.id === selectedCategory)?.name || 'Unknown'}
+                    Category: {
+                      // Try to find by slug first, then by id
+                      categories.find(c => c.slug === selectedCategory)?.name ||
+                      categories.find(c => c.id === selectedCategory)?.name ||
+                      'Unknown'
+                    }
                     <X 
                       className="ml-1 h-3 w-3 cursor-pointer" 
                       onClick={() => {
