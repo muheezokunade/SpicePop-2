@@ -63,6 +63,7 @@ export const ADMIN_NAV_ITEMS = [
   { label: 'Products', href: '/admin/products', icon: 'Package' },
   { label: 'Categories', href: '/admin/categories', icon: 'FolderTree' },
   { label: 'Orders', href: '/admin/orders', icon: 'ShoppingCart' },
+  { label: 'Blog', href: '/admin/blog', icon: 'FileText' },
   { label: 'Settings', href: '/admin/settings', icon: 'Settings' }
 ];
 

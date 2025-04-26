@@ -1,20 +1,73 @@
 import { Link } from 'wouter';
-import { Calendar, ArrowRight, Clock, Tag as TagIcon, CalendarDays } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { ArrowRight, Clock, Tag as TagIcon, CalendarDays, BookOpen, ScrollText } from 'lucide-react';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { formatDate, truncateText } from '@/lib/utils';
 import { BlogPost } from '@shared/schema';
+import { DEFAULT_CATEGORIES } from '@/lib/constants';
 
 interface BlogCardProps {
   post: BlogPost;
+  variant?: 'default' | 'compact';
 }
 
-export default function BlogCard({ post }: BlogCardProps) {
+export default function BlogCard({ post, variant = 'default' }: BlogCardProps) {
+  // Calculate reading time (roughly 200 words per minute)
+  const getReadingTime = (content: string): number => {
+    const words = content.trim().split(/\s+/).length;
+    const readingTime = Math.ceil(words / 200);
+    return readingTime < 1 ? 1 : readingTime;
+  };
+  
+  // Get category name from slug
+  const getCategoryName = (categoryId?: string | null) => {
+    if (!categoryId) return null;
+    return DEFAULT_CATEGORIES.find(c => c.slug === categoryId)?.name || categoryId;
+  };
+
+  if (variant === 'compact') {
+    return (
+      <div className="flex gap-4 items-start py-4 group">
+        <div className="w-16 h-16 rounded-md overflow-hidden flex-shrink-0">
+          {post.imageUrl ? (
+            <img 
+              src={post.imageUrl} 
+              alt={post.title} 
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="w-full h-full bg-primary/10 flex items-center justify-center">
+              <ScrollText className="h-6 w-6 text-primary/50" />
+            </div>
+          )}
+        </div>
+        
+        <div className="flex-1">
+          <h3 className="font-medium text-sm mb-1 line-clamp-2 group-hover:text-primary transition-colors">
+            <Link href={`/blog/${post.slug}`}>
+              <a className="block after:absolute after:inset-0 after:content-['']">
+                {post.title}
+              </a>
+            </Link>
+          </h3>
+          
+          <div className="flex items-center text-xs text-muted-foreground">
+            <time dateTime={new Date(post.createdAt).toISOString()}>
+              {formatDate(new Date(post.createdAt))}
+            </time>
+            <span className="mx-2">•</span>
+            <span>{getReadingTime(post.content)} min read</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <Card className="overflow-hidden flex flex-col h-full group hover:shadow-lg transition-all duration-300 border hover:border-primary/20">
+    <Card className="overflow-hidden flex flex-col h-full group hover:shadow-md transition-all duration-300 border border-gray-100 hover:border-primary/20">
       {/* Image Container with Overlay */}
-      <div className="relative h-56 overflow-hidden">
+      <div className="relative h-52 overflow-hidden">
         {post.imageUrl ? (
           <>
             <img 
@@ -22,11 +75,11 @@ export default function BlogCard({ post }: BlogCardProps) {
               alt={post.title} 
               className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-60" />
           </>
         ) : (
-          <div className="w-full h-full bg-muted flex items-center justify-center">
-            <TagIcon className="h-12 w-12 text-muted-foreground" />
+          <div className="w-full h-full bg-gradient-to-r from-primary/10 to-secondary/10 flex items-center justify-center">
+            <BookOpen className="h-12 w-12 text-primary/30" />
           </div>
         )}
         
@@ -34,64 +87,49 @@ export default function BlogCard({ post }: BlogCardProps) {
         {post.categoryId && (
           <Badge 
             variant="secondary" 
-            className="absolute top-3 right-3 bg-white/90 text-primary font-medium shadow-sm"
+            className="absolute top-3 left-3 bg-primary text-white font-medium shadow-sm"
           >
-            {post.categoryId}
+            {getCategoryName(post.categoryId)}
           </Badge>
         )}
         
-        {/* Date Badge - New */}
-        <div className="absolute bottom-3 left-3 flex items-center gap-1.5 bg-black/70 text-white text-xs px-3 py-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-          <CalendarDays className="h-3 w-3" />
-          <time dateTime={new Date(post.createdAt).toISOString()}>
-            {formatDate(new Date(post.createdAt))}
-          </time>
+        {/* Meta information overlay */}
+        <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
+          <h3 className="font-bold text-lg mb-1 line-clamp-2 drop-shadow-sm">
+            <Link href={`/blog/${post.slug}`}>
+              <a className="hover:text-primary/90 transition-colors">
+                {post.title}
+              </a>
+            </Link>
+          </h3>
+          
+          <div className="flex items-center gap-4 text-xs text-white/80">
+            <div className="flex items-center gap-1">
+              <CalendarDays className="h-3 w-3" />
+              <time dateTime={new Date(post.createdAt).toISOString()}>
+                {formatDate(new Date(post.createdAt))}
+              </time>
+            </div>
+            <div className="flex items-center gap-1">
+              <Clock className="h-3 w-3" />
+              <span>{getReadingTime(post.content)} min read</span>
+            </div>
+          </div>
         </div>
       </div>
       
-      <CardHeader className="pb-2 pt-5">
-        <div className="flex items-center justify-between text-xs text-muted-foreground mb-3">
-          <div className="flex items-center gap-1">
-            <CalendarDays className="h-3 w-3" />
-            <time dateTime={new Date(post.createdAt).toISOString()}>
-              {new Date(post.createdAt).toLocaleDateString('en-NG', { 
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric',
-              })}
-            </time>
-          </div>
-          <div className="flex items-center gap-1">
-            <Clock className="h-3 w-3" />
-            <span>3 min read</span>
-          </div>
-        </div>
-        
-        <CardTitle className="line-clamp-2 text-xl group-hover:text-primary transition-colors">
-          <Link href={`/blog/${post.slug}`}>
-            <a className="block after:absolute after:inset-0 after:content-['']">
-              {post.title}
-            </a>
-          </Link>
-        </CardTitle>
-      </CardHeader>
-      
-      <CardContent className="flex-grow">
+      <CardContent className="flex-grow pt-5">
         <p className="text-muted-foreground text-sm line-clamp-3">
           {post.excerpt || truncateText(post.content, 120)}
         </p>
       </CardContent>
       
-      <CardFooter className="pt-4 pb-5">
+      <CardFooter className="pt-0 pb-5">
         <Link href={`/blog/${post.slug}`}>
-          <Button 
-            variant="outline" 
-            size="sm"
-            className="text-primary border-primary/30 hover:bg-primary/5 transition-colors"
-          >
-            Read More
-            <ArrowRight className="h-4 w-4 ml-1.5 transition-transform group-hover:translate-x-1" />
-          </Button>
+          <a className="inline-flex items-center text-primary font-medium text-sm hover:underline">
+            Read Article
+            <ArrowRight className="h-3.5 w-3.5 ml-1.5 transition-transform group-hover:translate-x-1" />
+          </a>
         </Link>
       </CardFooter>
     </Card>
