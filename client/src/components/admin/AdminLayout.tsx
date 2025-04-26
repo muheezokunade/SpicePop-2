@@ -30,39 +30,36 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   const queryClient = useQueryClient();
   
   // Check if is admin
-  const { data: user, isLoading } = useQuery({
+  const { data: user, isLoading, isError } = useQuery({
     queryKey: ['/api/auth/check'],
     queryFn: async () => {
-      try {
-        const res = await fetch('/api/auth/check', {
-          credentials: 'include'
-        });
-        
-        if (!res.ok) {
-          if (res.status === 401) {
-            throw new Error("Unauthorized");
-          }
-          throw new Error("Failed to check auth status");
+      const res = await fetch('/api/auth/check', {
+        credentials: 'include'
+      });
+      
+      if (!res.ok) {
+        if (res.status === 401) {
+          throw new Error("Unauthorized");
         }
-        
-        return res.json();
-      } catch (error) {
-        throw error;
+        throw new Error("Failed to check auth status");
       }
+      
+      return res.json();
     },
-    retry: false,
-    onError: () => {
-      // If not authenticated and not on login page, redirect to login
-      if (!location.startsWith('/admin/login')) {
-        toast({
-          title: "Authentication required",
-          description: "Please log in to access the admin area",
-          variant: "destructive",
-        });
-        setLocation('/admin/login');
-      }
-    }
+    retry: false
   });
+  
+  // Handle authentication error separately
+  useEffect(() => {
+    if (isError && !location.startsWith('/admin/login')) {
+      toast({
+        title: "Authentication required",
+        description: "Please log in to access the admin area",
+        variant: "destructive",
+      });
+      setLocation('/admin/login');
+    }
+  }, [isError, location, setLocation, toast]);
   
   // Redirect to login if not authenticated
   useEffect(() => {

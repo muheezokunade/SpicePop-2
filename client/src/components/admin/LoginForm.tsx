@@ -153,9 +153,7 @@ export default function LoginForm() {
             </form>
           </Form>
           
-          <div className="mt-6 text-center text-sm text-gray-500">
-            <p>Default login: admin / admin123</p>
-          </div>
+
         </CardContent>
       </Card>
     </div>
