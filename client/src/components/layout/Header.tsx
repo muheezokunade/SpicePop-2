@@ -12,12 +12,21 @@ import {
   X 
 } from 'lucide-react';
 import CartDrawer from './CartDrawer';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from '@/components/ui/input';
 
 export default function Header() {
-  const [location] = useLocation();
+  const [location, setLocation] = useLocation();
   const { itemCount, setIsCartOpen } = useCart();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
   
   // Handle scroll effect
   useEffect(() => {
@@ -33,6 +42,16 @@ export default function Header() {
   useEffect(() => {
     setIsMobileMenuOpen(false);
   }, [location]);
+  
+  // Handle search submission
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchTerm.trim()) {
+      setIsSearchOpen(false);
+      setLocation(`/shop?search=${encodeURIComponent(searchTerm.trim())}`);
+      console.log('Header search redirecting to:', `/shop?search=${encodeURIComponent(searchTerm.trim())}`);
+    }
+  };
   
   return (
     <>
@@ -59,7 +78,12 @@ export default function Header() {
             
             {/* Actions */}
             <div className="flex items-center space-x-4">
-              <Button variant="ghost" size="icon" aria-label="Search">
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                aria-label="Search"
+                onClick={() => setIsSearchOpen(true)}
+              >
                 <Search className="h-5 w-5" />
               </Button>
               
@@ -98,6 +122,19 @@ export default function Header() {
         {/* Mobile Navigation Dropdown */}
         {isMobileMenuOpen && (
           <div className="bg-white shadow-md px-4 py-2 md:hidden">
+            <div className="py-3 mb-2">
+              <Button 
+                variant="outline"
+                className="w-full flex items-center justify-start text-gray-600"
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  setIsSearchOpen(true);
+                }}
+              >
+                <Search className="h-4 w-4 mr-2" />
+                Search products
+              </Button>
+            </div>
             <nav className="flex flex-col space-y-3 py-3">
               {MAIN_NAV_ITEMS.map(item => (
                 <Link 
@@ -115,6 +152,52 @@ export default function Header() {
       
       {/* Cart Drawer */}
       <CartDrawer />
+      
+      {/* Search Dialog */}
+      <Dialog open={isSearchOpen} onOpenChange={setIsSearchOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Search Products</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleSearch} className="space-y-4 pt-4">
+            <div className="flex items-center relative">
+              <Input
+                id="header-search"
+                type="text"
+                placeholder="Search for spices, foodstuff, snacks..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pr-10"
+                autoFocus
+              />
+              <Button 
+                type="submit" 
+                variant="ghost" 
+                size="icon"
+                className="absolute right-0 top-0 text-gray-400 hover:text-primary"
+                disabled={!searchTerm.trim()}
+              >
+                <Search className="h-4 w-4" />
+              </Button>
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => setIsSearchOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button 
+                type="submit"
+                disabled={!searchTerm.trim()}
+              >
+                Search
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
