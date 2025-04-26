@@ -75,7 +75,7 @@ export default function CategorySection() {
           {/* First row - large cards */}
           {proteinCategory && (
             <div className="relative rounded-xl overflow-hidden group h-64">
-              <Link href={`/shop/category/${proteinCategory.slug}`} className="block w-full h-full">
+              <Link href={`/shop?category=${proteinCategory.slug}`} className="block w-full h-full">
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent z-10 transition-opacity group-hover:opacity-80"></div>
                 <img 
                   src={proteinCategory.imageUrl || ''} 
@@ -93,7 +93,7 @@ export default function CategorySection() {
           
           {spicesCategory && (
             <div className="relative rounded-xl overflow-hidden group h-64">
-              <Link href={`/shop/category/${spicesCategory.slug}`} className="block w-full h-full">
+              <Link href={`/shop?category=${spicesCategory.slug}`} className="block w-full h-full">
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-10 transition-opacity group-hover:opacity-80"></div>
                 <img 
                   src={spicesCategory.imageUrl || ''} 
@@ -110,7 +110,7 @@ export default function CategorySection() {
           {/* Medium cards - second row */}
           {grainsRiceCategory && (
             <div className="relative rounded-xl overflow-hidden group h-48">
-              <Link href={`/shop/category/${grainsRiceCategory.slug}`} className="block w-full h-full">
+              <Link href={`/shop?category=${grainsRiceCategory.slug}`} className="block w-full h-full">
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-10 transition-opacity group-hover:opacity-80"></div>
                 <img 
                   src={grainsRiceCategory.imageUrl || ''} 
@@ -126,7 +126,7 @@ export default function CategorySection() {
           
           {snacksCategory && (
             <div className="relative rounded-xl overflow-hidden group h-48">
-              <Link href={`/shop/category/${snacksCategory.slug}`} className="block w-full h-full">
+              <Link href={`/shop?category=${snacksCategory.slug}`} className="block w-full h-full">
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-10 transition-opacity group-hover:opacity-80"></div>
                 <img 
                   src={snacksCategory.imageUrl || ''} 
@@ -143,7 +143,7 @@ export default function CategorySection() {
           {/* Medium cards - third row */}
           {recipeBundlesCategory && (
             <div className="relative rounded-xl overflow-hidden group h-48">
-              <Link href={`/shop/category/${recipeBundlesCategory.slug}`} className="block w-full h-full">
+              <Link href={`/shop?category=${recipeBundlesCategory.slug}`} className="block w-full h-full">
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-10 transition-opacity group-hover:opacity-80"></div>
                 <img 
                   src={recipeBundlesCategory.imageUrl || ''} 
@@ -159,7 +159,7 @@ export default function CategorySection() {
           
           {saucesCategory && (
             <div className="relative rounded-xl overflow-hidden group h-48">
-              <Link href={`/shop/category/${saucesCategory.slug}`} className="block w-full h-full">
+              <Link href={`/shop?category=${saucesCategory.slug}`} className="block w-full h-full">
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-10 transition-opacity group-hover:opacity-80"></div>
                 <img 
                   src={saucesCategory.imageUrl || ''} 
@@ -181,7 +181,7 @@ export default function CategorySection() {
             )
             .map(category => (
               <div key={category.id} className="relative rounded-xl overflow-hidden group h-48">
-                <Link href={`/shop/category/${category.slug}`} className="block w-full h-full">
+                <Link href={`/shop?category=${category.slug}`} className="block w-full h-full">
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-10 transition-opacity group-hover:opacity-80"></div>
                   <img 
                     src={category.imageUrl || ''} 
