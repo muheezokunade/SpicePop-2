@@ -112,8 +112,12 @@ export const API_ENDPOINTS = {
   blog: {
     list: '/api/blog',
     all: '/api/blog/all',
+    admin: {
+      list: '/api/blog/all'
+    },
+    create: '/api/blog',
     byCategory: (categoryId: string) => `/api/blog/category/${categoryId}`,
-    detail: (slug: string) => `/api/blog/${slug}`
+    detail: (id: string) => `/api/blog/${id}`
   }
 };
 

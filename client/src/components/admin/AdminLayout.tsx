@@ -11,7 +11,8 @@ import {
   Settings, 
   LogOut, 
   Menu, 
-  X 
+  X,
+  FileText
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
@@ -115,6 +116,8 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         return <FolderTree className="h-5 w-5" />;
       case 'ShoppingCart':
         return <ShoppingCart className="h-5 w-5" />;
+      case 'FileText':
+        return <FileText className="h-5 w-5" />;
       case 'Settings':
         return <Settings className="h-5 w-5" />;
       default:

@@ -79,7 +79,7 @@ export default function BlogPostForm({ post, isEdit = false }: BlogPostFormProps
       slug: post?.slug || '',
       excerpt: post?.excerpt || '',
       content: post?.content || '',
-      imageUrl: post?.imageUrl || '',
+      imageUrl: post?.imageUrl || undefined,
       categoryId: post?.categoryId || '',
       published: post?.published ?? true,
     },
@@ -251,7 +251,7 @@ export default function BlogPostForm({ post, isEdit = false }: BlogPostFormProps
                   {form.getValues('imageUrl') && (
                     <div className="w-full h-64 rounded-md overflow-hidden">
                       <img
-                        src={form.getValues('imageUrl')}
+                        src={form.getValues('imageUrl') || ''}
                         alt={form.getValues('title')}
                         className="w-full h-full object-cover"
                       />
@@ -464,7 +464,7 @@ export default function BlogPostForm({ post, isEdit = false }: BlogPostFormProps
                     <div className="rounded-md overflow-hidden border">
                       <div className="aspect-video relative bg-muted">
                         <img
-                          src={form.watch('imageUrl')}
+                          src={form.watch('imageUrl') || ''}
                           alt="Preview"
                           className="w-full h-full object-cover"
                           onError={(e) => {

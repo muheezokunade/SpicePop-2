@@ -76,7 +76,7 @@ export default function AdminBlogPage() {
     isLoading,
     error,
   } = useQuery<BlogPost[]>({
-    queryKey: [API_ENDPOINTS.blog.admin.list],
+    queryKey: [API_ENDPOINTS.blog.all],
   });
 
   // Delete blog post mutation
@@ -95,7 +95,7 @@ export default function AdminBlogPage() {
       setPostToDelete(null);
       
       // Invalidate queries
-      queryClient.invalidateQueries({ queryKey: [API_ENDPOINTS.blog.admin.list] });
+      queryClient.invalidateQueries({ queryKey: [API_ENDPOINTS.blog.all] });
       queryClient.invalidateQueries({ queryKey: [API_ENDPOINTS.blog.list] });
     },
     onError: (error: any) => {
