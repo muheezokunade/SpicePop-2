@@ -447,6 +447,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // SEO files routes (sitemap and robots.txt)
   router.get('/sitemap.xml', (req, res) => {
+    res.header('Content-Type', 'application/xml');
     res.sendFile('sitemap.xml', { root: './public' });
   });
   
@@ -459,6 +460,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Also add root-level routes for SEO files
   app.get('/sitemap.xml', (req, res) => {
+    res.header('Content-Type', 'application/xml');
     res.sendFile('sitemap.xml', { root: './public' });
   });
   

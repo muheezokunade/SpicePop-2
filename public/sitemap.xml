@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <!-- Main Pages -->
   <url>
     <loc>https://spicepop.com/</loc>
     <changefreq>daily</changefreq>
@@ -44,7 +43,6 @@
     <lastmod>2025-04-26</lastmod>
   </url>
 
-  <!-- Category Pages -->
   <url>
     <loc>https://spicepop.com/shop?category=protein</loc>
     <changefreq>weekly</changefreq>
@@ -82,7 +80,6 @@
     <lastmod>2025-04-26</lastmod>
   </url>
 
-  <!-- Product Pages -->
   <url>
     <loc>https://spicepop.com/product/nigerian-pepper-mix</loc>
     <changefreq>weekly</changefreq>
@@ -132,7 +129,6 @@
     <lastmod>2025-04-26</lastmod>
   </url>
 
-  <!-- Blog Posts -->
   <url>
     <loc>https://spicepop.com/blog/how-to-make-nigerian-jollof-rice</loc>
     <changefreq>monthly</changefreq>
@@ -152,7 +148,6 @@
     <lastmod>2025-04-26</lastmod>
   </url>
 
-  <!-- Store Locations -->
   <url>
     <loc>https://spicepop.com/store-locations</loc>
     <changefreq>monthly</changefreq>
