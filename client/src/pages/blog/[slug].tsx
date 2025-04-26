@@ -12,7 +12,7 @@ import Footer from "@/components/Footer";
 import Loading from "@/components/Loading";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { SITE_NAME, SOCIAL_LINKS } from "@/lib/constants";
+import { SITE_NAME, SOCIAL_LINKS, API_ENDPOINTS } from "@/lib/constants";
 import { formatDate } from "@/lib/utils";
 import { BlogPost } from "@shared/schema";
 
@@ -20,7 +20,7 @@ export default function BlogPostPage() {
   const { slug } = useParams();
   
   const { data: post, isLoading, error } = useQuery<BlogPost>({
-    queryKey: [`/api/blog/${slug}`],
+    queryKey: [API_ENDPOINTS.blog.bySlug(slug || '')],
   });
   
   // For SEO and meta tags
@@ -248,9 +248,23 @@ export default function BlogPostPage() {
                     
                     {/* Post Content */}
                     <div className="prose prose-lg max-w-none prose-headings:text-gray-900 prose-headings:font-bold prose-p:text-gray-700 prose-a:text-primary hover:prose-a:text-primary/80 prose-strong:text-gray-900 prose-img:rounded-lg">
-                      {post.content.split('\n\n').map((paragraph, idx) => (
-                        <p key={idx}>{paragraph}</p>
-                      ))}
+                      {post.content.split('\n\n').map((paragraph, idx) => {
+                        // Process markdown for headers
+                        if (paragraph.startsWith('# ')) {
+                          return <h1 key={idx} className="text-3xl font-bold mt-10 mb-4">{paragraph.substring(2)}</h1>;
+                        } else if (paragraph.startsWith('## ')) {
+                          return <h2 key={idx} className="text-2xl font-bold mt-8 mb-3">{paragraph.substring(3)}</h2>;
+                        } else if (paragraph.startsWith('### ')) {
+                          return <h3 key={idx} className="text-xl font-bold mt-6 mb-2">{paragraph.substring(4)}</h3>;
+                        }
+                        
+                        // Process markdown for bold and italic
+                        const processedText = paragraph
+                          .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+                          .replace(/\*([^*]+)\*/g, '<em>$1</em>');
+                        
+                        return <p key={idx} dangerouslySetInnerHTML={{ __html: processedText }} />;
+                      })}
                     </div>
                     
                     {/* Tags */}
