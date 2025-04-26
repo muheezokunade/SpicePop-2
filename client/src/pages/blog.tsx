@@ -218,10 +218,8 @@ export default function BlogPage() {
                           
                           <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
                             <h3 className="text-2xl font-bold mb-2 drop-shadow-md">
-                              <Link href={`/blog/${featuredPosts[0].slug}`}>
-                                <a className="hover:text-primary transition-colors">
-                                  {featuredPosts[0].title}
-                                </a>
+                              <Link href={`/blog/${featuredPosts[0].slug}`} className="hover:text-primary transition-colors">
+                                {featuredPosts[0].title}
                               </Link>
                             </h3>
                             
@@ -245,11 +243,9 @@ export default function BlogPage() {
                             {featuredPosts[0].excerpt || truncateText(featuredPosts[0].content, 180)}
                           </p>
                           
-                          <Link href={`/blog/${featuredPosts[0].slug}`}>
-                            <a className="inline-flex items-center text-primary font-medium hover:underline">
-                              Read Full Article
-                              <ArrowRight className="ml-2 h-4 w-4" />
-                            </a>
+                          <Link href={`/blog/${featuredPosts[0].slug}`} className="inline-flex items-center text-primary font-medium hover:underline">
+                            Read Full Article
+                            <ArrowRight className="ml-2 h-4 w-4" />
                           </Link>
                         </div>
                       </div>
@@ -285,10 +281,8 @@ export default function BlogPage() {
                           <div className="p-5 flex flex-col flex-grow">
                             <div className="mb-2">
                               <h3 className="text-lg font-bold mb-2">
-                                <Link href={`/blog/${post.slug}`}>
-                                  <a className="hover:text-primary transition-colors">
-                                    {post.title}
-                                  </a>
+                                <Link href={`/blog/${post.slug}`} className="hover:text-primary transition-colors">
+                                  {post.title}
                                 </Link>
                               </h3>
                               
@@ -310,11 +304,9 @@ export default function BlogPage() {
                               {post.excerpt || truncateText(post.content, 100)}
                             </p>
                             
-                            <Link href={`/blog/${post.slug}`}>
-                              <a className="inline-flex items-center text-primary text-sm font-medium hover:underline">
-                                Read Article
-                                <ArrowRight className="ml-1 h-3 w-3" />
-                              </a>
+                            <Link href={`/blog/${post.slug}`} className="inline-flex items-center text-primary text-sm font-medium hover:underline">
+                              Read Article
+                              <ArrowRight className="ml-1 h-3 w-3" />
                             </Link>
                           </div>
                         </div>

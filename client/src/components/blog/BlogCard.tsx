@@ -45,10 +45,8 @@ export default function BlogCard({ post, variant = 'default' }: BlogCardProps) {
         
         <div className="flex-1">
           <h3 className="font-medium text-sm mb-1 line-clamp-2 group-hover:text-primary transition-colors">
-            <Link href={`/blog/${post.slug}`}>
-              <a className="block after:absolute after:inset-0 after:content-['']">
-                {post.title}
-              </a>
+            <Link href={`/blog/${post.slug}`} className="block after:absolute after:inset-0 after:content-['']">
+              {post.title}
             </Link>
           </h3>
           
@@ -96,10 +94,8 @@ export default function BlogCard({ post, variant = 'default' }: BlogCardProps) {
         {/* Meta information overlay */}
         <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
           <h3 className="font-bold text-lg mb-1 line-clamp-2 drop-shadow-sm">
-            <Link href={`/blog/${post.slug}`}>
-              <a className="hover:text-primary/90 transition-colors">
-                {post.title}
-              </a>
+            <Link href={`/blog/${post.slug}`} className="hover:text-primary/90 transition-colors">
+              {post.title}
             </Link>
           </h3>
           
@@ -125,11 +121,9 @@ export default function BlogCard({ post, variant = 'default' }: BlogCardProps) {
       </CardContent>
       
       <CardFooter className="pt-0 pb-5">
-        <Link href={`/blog/${post.slug}`}>
-          <a className="inline-flex items-center text-primary font-medium text-sm hover:underline">
-            Read Article
-            <ArrowRight className="h-3.5 w-3.5 ml-1.5 transition-transform group-hover:translate-x-1" />
-          </a>
+        <Link href={`/blog/${post.slug}`} className="inline-flex items-center text-primary font-medium text-sm hover:underline">
+          Read Article
+          <ArrowRight className="h-3.5 w-3.5 ml-1.5 transition-transform group-hover:translate-x-1" />
         </Link>
       </CardFooter>
     </Card>
