@@ -40,7 +40,8 @@ export default function ProductFilters({
 }: ProductFiltersProps) {
   const [, setLocation] = useLocation();
   const [searchTerm, setSearchTerm] = useState(initialFilters.search || '');
-  const [selectedCategory, setSelectedCategory] = useState(initialFilters.category || '');
+  // Initialize with the category from initialFilters - could be an ID or a slug
+  const [selectedCategory, setSelectedCategory] = useState('');
   const [priceRange, setPriceRange] = useState<number[]>([
     parseInt(initialFilters.minPrice || '0'), 
     parseInt(initialFilters.maxPrice || '10000')

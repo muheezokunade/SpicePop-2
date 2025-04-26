@@ -47,9 +47,17 @@ export default function ShopPage() {
     
     // Set active tab based on category filter
     if (initialFilters.category && categories) {
-      const category = categories.find(c => c.id === initialFilters.category);
-      if (category) {
-        setActiveTab(category.slug);
+      // First check if the category parameter is a slug
+      const categoryBySlug = categories.find(c => c.slug === initialFilters.category);
+      
+      if (categoryBySlug) {
+        setActiveTab(categoryBySlug.slug);
+      } else {
+        // Fall back to checking by ID (for backward compatibility)
+        const categoryById = categories.find(c => c.id === initialFilters.category);
+        if (categoryById) {
+          setActiveTab(categoryById.slug);
+        }
       }
     } else {
       setActiveTab("all");

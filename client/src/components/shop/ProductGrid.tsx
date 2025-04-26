@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Product } from '@shared/schema';
+import { Product, Category } from '@shared/schema';
 import { ProductCard } from '@/components/ui/product-card';
 import { API_ENDPOINTS } from '@/lib/constants';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -18,19 +18,32 @@ export default function ProductGrid({ filters }: ProductGridProps) {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [mobileSort, setMobileSort] = useState(filters.sort || 'name-asc');
   
-  const { data: products, isLoading } = useQuery<Product[]>({
+  const { data: products, isLoading: isLoadingProducts } = useQuery<Product[]>({
     queryKey: [API_ENDPOINTS.products.list],
+  });
+  
+  const { data: categories } = useQuery<Category[]>({
+    queryKey: [API_ENDPOINTS.categories.list],
   });
   
   // Apply filters whenever filters or products change
   useEffect(() => {
-    if (!products) return;
+    if (!products || !categories) return;
     
     let result = [...products];
     
     // Apply category filter
     if (filters.category) {
-      result = result.filter(product => product.categoryId === filters.category);
+      // First try to find category by slug
+      const categoryBySlug = categories.find(c => c.slug === filters.category);
+      
+      if (categoryBySlug) {
+        // If found by slug, filter by categoryId
+        result = result.filter(product => product.categoryId === categoryBySlug.id);
+      } else {
+        // Fall back to filtering by category ID
+        result = result.filter(product => product.categoryId === filters.category);
+      }
     }
     
     // Apply price filter
@@ -123,7 +136,7 @@ export default function ProductGrid({ filters }: ProductGridProps) {
   };
   
   // Loading state
-  if (isLoading) {
+  if (isLoadingProducts) {
     return (
       <div>
         <div className="hidden lg:flex justify-between items-center mb-6">
