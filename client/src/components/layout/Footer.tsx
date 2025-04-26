@@ -6,11 +6,13 @@ import {
   Twitter,
   MapPin,
   Mail,
-  Phone
+  Phone,
+  MessageCircle
 } from 'lucide-react';
+import { SiTiktok } from 'react-icons/si';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { FOOTER_LINKS, CONTACT_EMAIL, CONTACT_PHONE, CONTACT_ADDRESS } from '@/lib/constants';
+import { FOOTER_LINKS, CONTACT_EMAIL, CONTACT_PHONE, CONTACT_ADDRESS, SOCIAL_LINKS } from '@/lib/constants';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
@@ -30,14 +32,50 @@ export default function Footer() {
               you the most authentic flavors.
             </p>
             <div className="flex space-x-4">
-              <a href="#" className="text-gray-500 hover:text-primary transition-colors">
+              <a 
+                href={SOCIAL_LINKS.facebook} 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="text-gray-500 hover:text-primary transition-colors"
+                aria-label="Facebook"
+              >
                 <Facebook className="h-5 w-5" />
               </a>
-              <a href="#" className="text-gray-500 hover:text-primary transition-colors">
+              <a 
+                href={SOCIAL_LINKS.instagram} 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="text-gray-500 hover:text-primary transition-colors"
+                aria-label="Instagram"
+              >
                 <Instagram className="h-5 w-5" />
               </a>
-              <a href="#" className="text-gray-500 hover:text-primary transition-colors">
+              <a 
+                href={SOCIAL_LINKS.twitter} 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="text-gray-500 hover:text-primary transition-colors"
+                aria-label="Twitter"
+              >
                 <Twitter className="h-5 w-5" />
+              </a>
+              <a 
+                href={SOCIAL_LINKS.tiktok} 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="text-gray-500 hover:text-primary transition-colors"
+                aria-label="TikTok"
+              >
+                <SiTiktok className="h-4 w-4" />
+              </a>
+              <a 
+                href={SOCIAL_LINKS.whatsapp} 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="text-gray-500 hover:text-primary transition-colors"
+                aria-label="WhatsApp"
+              >
+                <MessageCircle className="h-5 w-5" />
               </a>
             </div>
           </div>
