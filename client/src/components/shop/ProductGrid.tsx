@@ -30,6 +30,7 @@ export default function ProductGrid({ filters }: ProductGridProps) {
   useEffect(() => {
     if (!products || !categories) return;
     
+    console.log('ProductGrid received filters:', filters);
     let result = [...products];
     
     // Apply category filter

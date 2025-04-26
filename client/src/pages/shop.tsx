@@ -67,6 +67,7 @@ export default function ShopPage() {
   // Update URL with filters
   const handleUpdateFilters = (newFilters: Record<string, string>) => {
     // Set state with the new filters
+    console.log('Shop page received new filters:', newFilters);
     setFilters(newFilters);
     
     // Convert filters to URL search params
@@ -80,6 +81,7 @@ export default function ShopPage() {
     
     const searchString = searchParams.toString();
     const newUrl = searchString ? `/shop?${searchString}` : '/shop';
+    console.log('Updating URL to:', newUrl);
     
     // Update URL without triggering a navigation
     window.history.replaceState(null, '', newUrl);

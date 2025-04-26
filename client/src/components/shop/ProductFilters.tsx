@@ -78,6 +78,7 @@ export default function ProductFilters({
     if (priceRange[1] < 10000) filters.maxPrice = priceRange[1].toString();
     if (sortOption) filters.sort = sortOption;
     
+    console.log('Applying filters:', filters);
     onUpdateFilters(filters);
   };
   
@@ -89,6 +90,7 @@ export default function ProductFilters({
   
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('Search submitted with term:', searchTerm);
     applyFilters();
   };
   
