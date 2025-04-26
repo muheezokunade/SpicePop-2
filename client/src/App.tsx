@@ -27,6 +27,9 @@ import AdminEditProductPage from "@/pages/admin/products/[id]";
 import AdminCategoriesPage from "@/pages/admin/categories";
 import AdminOrdersPage from "@/pages/admin/orders";
 import AdminSettingsPage from "@/pages/admin/settings";
+import AdminBlogPage from "@/pages/admin/blog";
+import AdminNewBlogPostPage from "@/pages/admin/blog/new";
+import AdminEditBlogPostPage from "@/pages/admin/blog/edit/[id]";
 
 function Router() {
   return (
@@ -51,6 +54,9 @@ function Router() {
       <Route path="/admin/categories" component={AdminCategoriesPage} />
       <Route path="/admin/orders" component={AdminOrdersPage} />
       <Route path="/admin/settings" component={AdminSettingsPage} />
+      <Route path="/admin/blog" component={AdminBlogPage} />
+      <Route path="/admin/blog/new" component={AdminNewBlogPostPage} />
+      <Route path="/admin/blog/edit/:id" component={AdminEditBlogPostPage} />
       
       {/* Fallback to 404 */}
       <Route component={NotFound} />
