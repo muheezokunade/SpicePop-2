@@ -370,6 +370,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get blog post by ID (for admin editing)
+  router.get('/blog/id/:id', requireAuth, async (req, res) => {
+    try {
+      const post = await storage.getBlogPost(req.params.id);
+      
+      if (!post) {
+        return res.status(404).json({ message: 'Blog post not found' });
+      }
+      
+      res.json(post);
+    } catch (error) {
+      res.status(500).json({ message: 'Server error' });
+    }
+  });
+
   router.get('/blog/:slug', async (req, res) => {
     try {
       const post = await storage.getBlogPostBySlug(req.params.slug);

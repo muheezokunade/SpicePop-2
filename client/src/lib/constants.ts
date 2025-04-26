@@ -117,7 +117,8 @@ export const API_ENDPOINTS = {
     },
     create: '/api/blog',
     byCategory: (categoryId: string) => `/api/blog/category/${categoryId}`,
-    detail: (id: string) => `/api/blog/${id}`
+    detail: (id: string) => `/api/blog/id/${id}`, // Get blog post by ID for admin editing
+    bySlug: (slug: string) => `/api/blog/${slug}` // Get blog post by slug for public view
   }
 };
 
