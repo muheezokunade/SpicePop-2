@@ -1,9 +1,20 @@
+import dotenv from 'dotenv';
+import path from 'path';
+dotenv.config({ path: path.resolve(process.cwd(), '.env') });
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import path from 'path';
 import { storage } from './storage';
 import { db } from './db';
+
+// Debug logging
+console.log('Environment variables:', {
+  SUPABASE_URL: process.env.SUPABASE_URL,
+  DATABASE_URL: process.env.DATABASE_URL?.split('@')[1], // Only log the host part for security
+  NODE_ENV: process.env.NODE_ENV,
+  PORT: process.env.PORT
+});
 
 const app = express();
 app.use(express.json());
@@ -71,15 +82,9 @@ app.use((req, res, next) => {
       serveStatic(app);
     }
 
-    // ALWAYS serve the app on port 5000
-    // this serves both the API and the client.
-    // It is the only port that is not firewalled.
-    const port = 5000;
-    server.listen({
-      port,
-      host: "0.0.0.0",
-      reusePort: true,
-    }, () => {
+    // ALWAYS serve the app on port 3000 instead of 5000
+    const port = process.env.PORT || 3000;
+    server.listen(port, () => {
       log(`serving on port ${port}`);
     });
   } catch (error) {

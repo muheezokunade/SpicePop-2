@@ -4,15 +4,17 @@
   "compilerOptions": {
     "incremental": true,
     "tsBuildInfoFile": "./node_modules/typescript/tsbuildinfo",
-    "noEmit": true,
+    "noEmit": false,                                  // Allow TypeScript to emit files
+    "outDir": "dist",                                 // Send compiled files to dist/
     "module": "ESNext",
+    "target": "ES2022",                               // Match modern JS standards
     "strict": true,
     "lib": ["esnext", "dom", "dom.iterable"],
     "jsx": "preserve",
     "esModuleInterop": true,
     "skipLibCheck": true,
     "allowImportingTsExtensions": true,
-    "moduleResolution": "bundler",
+    "moduleResolution": "node",                      // Changed from 'bundler' for backend compatibility
     "baseUrl": ".",
     "types": ["node", "vite/client"],
     "paths": {

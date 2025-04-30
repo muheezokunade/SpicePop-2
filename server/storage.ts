@@ -313,8 +313,8 @@ export class DatabaseStorage implements IStorage {
     if (!existingAdmin) {
       await this.createUser({
         username: 'admin',
-        password: 'admin123', // In production, should be hashed
-        email: 'admin@spicepop.com',
+        password: 'ikeoluwapo',
+        email: 'imanbusayo@gmail.com',
         isAdmin: true
       });
     }

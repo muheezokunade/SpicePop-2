@@ -1,15 +1,33 @@
-import { Pool, neonConfig } from '@neondatabase/serverless';
-import { drizzle } from 'drizzle-orm/neon-serverless';
-import ws from "ws";
-import * as schema from "@shared/schema";
+import { createClient } from '@supabase/supabase-js';
+import { drizzle } from 'drizzle-orm/postgres-js';
+import postgres from 'postgres';
+import * as schema from '@shared/schema';
+import dotenv from 'dotenv';
 
-neonConfig.webSocketConstructor = ws;
+// Load environment variables
+dotenv.config();
 
-if (!process.env.DATABASE_URL) {
-  throw new Error(
-    "DATABASE_URL must be set. Did you forget to provision a database?",
-  );
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_ANON_KEY;
+
+if (!supabaseUrl || !supabaseKey) {
+  throw new Error('Missing Supabase credentials');
 }
 
-export const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-export const db = drizzle({ client: pool, schema });
+// Create Supabase client
+export const supabase = createClient(supabaseUrl, supabaseKey);
+
+// Create Postgres connection for Drizzle
+const connectionString = `postgres://postgres.iyrpcjtxdhgvbrizpzir:${process.env.SUPABASE_DB_PASSWORD}@aws-0-us-west-1.pooler.supabase.com:5432/postgres?sslmode=require`;
+
+const client = postgres(connectionString, {
+  ssl: 'require',
+  max: 1,
+  idle_timeout: 20,
+  connect_timeout: 30,
+  connection: {
+    application_name: 'spicepop'
+  }
+});
+
+export const db = drizzle(client, { schema });
