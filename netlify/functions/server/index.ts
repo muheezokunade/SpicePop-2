@@ -14,12 +14,17 @@ app.get('/api/test', (_req, res) => {
 });
 
 // Import your main Express app
-try {
-  const mainApp = require('../../server/server');
-  app.use(mainApp.default || mainApp);
-} catch (error) {
-  console.error('Failed to load server.ts:', error);
-}
+const initApp = async () => {
+  try {
+    const mainApp = await import('../../server/app');
+    app.use(mainApp.default || mainApp);
+  } catch (error) {
+    console.error('Failed to load app.ts:', error);
+  }
+};
+
+// Initialize the app
+initApp();
 
 // Export handler
 export const handler = serverless(app);
