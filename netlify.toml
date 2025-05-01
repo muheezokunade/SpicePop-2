@@ -1,6 +1,6 @@
 [build]
   functions = "netlify/functions"
-  publish = "dist"
+  publish = "dist/public"
   command = "npm install --include=dev && npm run build"
 
 [build.environment]
@@ -9,7 +9,7 @@
 
 [dev]
   framework = "vite"
-  publish = "dist"
+  publish = "dist/public"
   port = 8888
   autoLaunch = true
 
