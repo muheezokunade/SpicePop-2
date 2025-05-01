@@ -1,17 +1,17 @@
-import serverless from 'serverless-http';
 import express from 'express';
-import dotenv from 'dotenv';
-import path from 'path';
+import serverless from 'serverless-http';
 import cors from 'cors';
 import session from 'express-session';
 import passport from 'passport';
+import { config } from 'dotenv';
+import path from 'path';
 
-// Load env vars
-dotenv.config();
+// Load environment variables
+config();
 
 const app = express();
 
-// Middleware
+// Basic middleware
 app.use(cors({
   origin: process.env.FRONTEND_URL || '*',
   credentials: true
@@ -34,40 +34,32 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Simple test route
-app.get('/api/test', (_req, res) => {
+// Test route
+app.get('/api/test', (req, res) => {
   res.json({ message: 'API is working!' });
 });
 
-// Import your main Express app
-const initApp = async () => {
-  try {
-    const mainApp = await import('@server/app');
-    const appModule = mainApp.default || mainApp;
-    
-    // Mount the app at /api
-    app.use('/api', appModule);
-    
-    // Error handling
-    app.use((err: any, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
-      console.error('Error:', err);
-      res.status(err.status || 500).json({
-        error: err.message || 'Internal Server Error'
-      });
-    });
-  } catch (error) {
-    console.error('Failed to load app.ts:', error);
-  }
-};
+// Import and mount the main application
+import('@server/app').then(({ default: mainApp }) => {
+  app.use('/api', mainApp);
+}).catch(error => {
+  console.error('Failed to load main application:', error);
+  app.use('/api', (req, res) => {
+    res.status(500).json({ error: 'Failed to load application' });
+  });
+});
 
-// Initialize the app
-initApp();
+// Error handling
+app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+  console.error(err.stack);
+  res.status(500).json({ error: 'Something broke!' });
+});
 
-// Export handler
+// Export the serverless handler
 export const handler = serverless(app, {
   binary: [
     'application/octet-stream',
-    'image/*',
-    'application/pdf'
+    'application/pdf',
+    'image/*'
   ]
 });

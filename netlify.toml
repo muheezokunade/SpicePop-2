@@ -15,7 +15,18 @@
   autoLaunch = true
 
 [functions]
-  external_node_modules = ["express", "pg", "cors", "passport", "jsonwebtoken", "bcryptjs", "multer", "sharp", "nodemailer", "stripe", "aws-sdk", "multer-s3", "dotenv", "express-session", "connect-pg-simple", "helmet", "compression", "express-rate-limit", "express-validator", "winston", "morgan", "cron", "node-cron", "nodemailer-express-handlebars", "handlebars", "moment", "uuid", "slugify", "sanitize-html", "cheerio", "puppeteer", "puppeteer-extra", "puppeteer-extra-plugin-stealth", "puppeteer-extra-plugin-adblocker", "puppeteer-extra-plugin-block-resources", "puppeteer-extra-plugin-flash", "puppeteer-extra-plugin-user-preferences", "puppeteer-extra-plugin-user-data-dir", "puppeteer-extra-plugin-anonymize-ua", "puppeteer-extra-plugin-recaptcha", "puppeteer-extra-plugin-font-size", "puppeteer-extra-plugin-user-agent", "puppeteer-extra-plugin-block-resources", "puppeteer-extra-plugin-flash", "puppeteer-extra-plugin-user-preferences", "puppeteer-extra-plugin-user-data-dir", "puppeteer-extra-plugin-anonymize-ua", "puppeteer-extra-plugin-recaptcha", "puppeteer-extra-plugin-font-size", "puppeteer-extra-plugin-user-agent"]
+  node_bundler = "esbuild"
+  external_node_modules = [
+    "express",
+    "pg",
+    "cors",
+    "passport",
+    "express-session",
+    "connect-pg-simple",
+    "dotenv",
+    "drizzle-orm",
+    "@neondatabase/serverless"
+  ]
 
 [[redirects]]
   from = "/api/*"
