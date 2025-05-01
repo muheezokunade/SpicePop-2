@@ -4,15 +4,15 @@ import cors from 'cors';
 import session from 'express-session';
 import passport from 'passport';
 import { config } from 'dotenv';
-import path from 'path';
 import { fileURLToPath } from 'url';
+import { dirname, resolve } from 'path';
 
 // Load environment variables
 config();
 
 // Get the directory name
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const __dirname = dirname(__filename);
 
 const app = express();
 
@@ -45,16 +45,21 @@ app.get('/api/test', (req, res) => {
 });
 
 // Import and mount the main application
-try {
-  const mainAppPath = path.resolve(__dirname, '../../../server/app.ts');
-  const mainApp = await import(mainAppPath);
-  app.use('/api', mainApp.default || mainApp);
-} catch (error) {
-  console.error('Failed to load main application:', error);
-  app.use('/api', (req, res) => {
-    res.status(500).json({ error: 'Failed to load application' });
-  });
-}
+const initApp = async () => {
+  try {
+    const mainAppPath = resolve(__dirname, '../../../server/app.ts');
+    const mainApp = await import(mainAppPath);
+    app.use('/api', mainApp.default || mainApp);
+  } catch (error) {
+    console.error('Failed to load main application:', error);
+    app.use('/api', (req, res) => {
+      res.status(500).json({ error: 'Failed to load application' });
+    });
+  }
+};
+
+// Initialize the app
+initApp();
 
 // Error handling
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
