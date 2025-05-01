@@ -1,17 +1,38 @@
 [build]
+  functions = "netlify/functions"
+  publish = "dist"
   command = "npm run build"
-  publish = "dist/public"
-  functions = "dist/functions"
 
 [build.environment]
   NODE_VERSION = "18"
+  NODE_ENV = "production"
+
+[dev]
+  framework = "vite"
+  publish = "dist"
+  port = 8888
+  autoLaunch = true
+
+[functions]
+  external_node_modules = [
+    "express",
+    "@supabase/supabase-js",
+    "postgres",
+    "@neondatabase/serverless",
+    "drizzle-orm",
+    "express-session",
+    "passport",
+    "passport-local"
+  ]
+  node_bundler = "esbuild"
+  included_files = ["server/**/*", ".env"]
 
 [[redirects]]
   from = "/api/*"
-  to = "/.netlify/functions/:splat"
+  to = "/.netlify/functions/server/:splat"
   status = 200
 
 [[redirects]]
   from = "/*"
   to = "/index.html"
-  status = 200 
+  status = 200
