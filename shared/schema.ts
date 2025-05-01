@@ -1,15 +1,18 @@
-import { pgTable, text, serial, integer, boolean, numeric, timestamp, jsonb, uuid } from "drizzle-orm/pg-core";
+import { pgTable, text, uuid, boolean, integer, jsonb, timestamp } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-// Users (admin users)
+// Users
 export const users = pgTable("users", {
-  id: serial("id").primaryKey(),
+  id: uuid("id").defaultRandom().primaryKey(),
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
   email: text("email").notNull().unique(),
   isAdmin: boolean("is_admin").default(false).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull()
+
 });
 
 // Categories
@@ -18,6 +21,9 @@ export const categories = pgTable("categories", {
   name: text("name").notNull(),
   slug: text("slug").notNull().unique(),
   imageUrl: text("image_url"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull()
+
 });
 
 // Products
@@ -26,26 +32,15 @@ export const products = pgTable("products", {
   name: text("name").notNull(),
   slug: text("slug").notNull().unique(),
   description: text("description").notNull(),
-  price: numeric("price").notNull(),
-  stock: integer("stock").notNull().default(0),
+  price: text("price").notNull(),
   imageUrl: text("image_url"),
-  categoryId: uuid("category_id").references(() => categories.id),
+  stock: integer("stock").default(0).notNull(),
+  categoryId: uuid("category_id").references(() => categories.id, { onDelete: 'set null' }),
   isFeatured: boolean("is_featured").default(false).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull()
+
 });
-
-// Define category relations
-export const categoriesRelations = relations(categories, ({ many }) => ({
-  products: many(products)
-}));
-
-// Define product relations
-export const productsRelations = relations(products, ({ one }) => ({
-  category: one(categories, {
-    fields: [products.categoryId],
-    references: [categories.id]
-  })
-}));
 
 // Orders
 export const orders = pgTable("orders", {
@@ -54,93 +49,76 @@ export const orders = pgTable("orders", {
   customerEmail: text("customer_email").notNull(),
   customerPhone: text("customer_phone").notNull(),
   shippingAddress: text("shipping_address").notNull(),
-  items: jsonb("items").notNull(), // Array of { productId, name, price, quantity }
-  totalAmount: numeric("total_amount").notNull(),
-  status: text("status").notNull().default("pending"), // pending, paid, shipped, delivered
+  items: jsonb("items").notNull(),
+  totalAmount: text("total_amount").notNull(),
+  status: text("status").default("pending").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull()
+
 });
 
 // Settings
 export const settings = pgTable("settings", {
-  id: serial("id").primaryKey(),
+  id: uuid("id").defaultRandom().primaryKey(),
   key: text("key").notNull().unique(),
   value: text("value").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull()
 });
 
 // Blog Posts
 export const blogPosts = pgTable("blog_posts", {
   id: uuid("id").defaultRandom().primaryKey(),
-  title: text("title").notNull(),
   slug: text("slug").notNull().unique(),
+  title: text("title").notNull(),
   excerpt: text("excerpt").notNull(),
   content: text("content").notNull(),
   imageUrl: text("image_url"),
-  authorId: integer("author_id").references(() => users.id),
-  published: boolean("published").default(true).notNull(),
-  categoryId: uuid("category_id").references(() => categories.id),
+  categoryId: uuid("category_id").references(() => categories.id, { onDelete: 'set null' }),
+  authorId: uuid("author_id").references(() => users.id, { onDelete: 'set null' }),
+  published: boolean("published").default(false).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull()
 });
 
-// Define blog relations
-export const blogPostsRelations = relations(blogPosts, ({ one }) => ({
-  author: one(users, {
-    fields: [blogPosts.authorId],
-    references: [users.id]
-  }),
+// Relations
+export const productsRelations = relations(products, ({ one }) => ({
   category: one(categories, {
-    fields: [blogPosts.categoryId],
-    references: [categories.id]
-  })
+    fields: [products.categoryId],
+    references: [categories.id],
+  }),
 }));
 
-// Create insert schemas
-export const insertUserSchema = createInsertSchema(users).omit({
-  id: true
-});
+export const blogPostsRelations = relations(blogPosts, ({ one }) => ({
+  category: one(categories, {
+    fields: [blogPosts.categoryId],
+    references: [categories.id],
+  }),
+  author: one(users, {
+    fields: [blogPosts.authorId],
+    references: [users.id],
+  }),
+}));
 
-export const insertCategorySchema = createInsertSchema(categories).omit({
-  id: true
-});
+// Zod Schemas for validation
+export const insertUserSchema = createInsertSchema(users);
+export const insertCategorySchema = createInsertSchema(categories);
+export const insertProductSchema = createInsertSchema(products);
+export const insertOrderSchema = createInsertSchema(orders);
+export const insertSettingSchema = createInsertSchema(settings);
+export const insertBlogPostSchema = createInsertSchema(blogPosts);
 
-export const insertProductSchema = createInsertSchema(products).omit({
-  id: true,
-  createdAt: true
-});
-
-export const insertOrderSchema = createInsertSchema(orders).omit({
-  id: true,
-  createdAt: true
-});
-
-export const insertSettingSchema = createInsertSchema(settings).omit({
-  id: true
-});
-
-export const insertBlogPostSchema = createInsertSchema(blogPosts).omit({
-  id: true,
-  createdAt: true,
-  updatedAt: true
-});
-
-// Create types
 export type User = typeof users.$inferSelect;
-export type InsertUser = z.infer<typeof insertUserSchema>;
-
+export type InsertUser = typeof users.$inferInsert;
 export type Category = typeof categories.$inferSelect;
-export type InsertCategory = z.infer<typeof insertCategorySchema>;
-
+export type InsertCategory = typeof categories.$inferInsert;
 export type Product = typeof products.$inferSelect;
-export type InsertProduct = z.infer<typeof insertProductSchema>;
-
+export type InsertProduct = typeof products.$inferInsert;
 export type Order = typeof orders.$inferSelect;
-export type InsertOrder = z.infer<typeof insertOrderSchema>;
-
+export type InsertOrder = typeof orders.$inferInsert;
 export type Setting = typeof settings.$inferSelect;
-export type InsertSetting = z.infer<typeof insertSettingSchema>;
-
+export type InsertSetting = typeof settings.$inferInsert;
 export type BlogPost = typeof blogPosts.$inferSelect;
-export type InsertBlogPost = z.infer<typeof insertBlogPostSchema>;
+export type InsertBlogPost = typeof blogPosts.$inferInsert;
 
 // Additional custom types
 export type CartItem = {

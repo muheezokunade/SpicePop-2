@@ -1,33 +1,24 @@
-import { createClient } from '@supabase/supabase-js';
-import { drizzle } from 'drizzle-orm/postgres-js';
-import postgres from 'postgres';
+import { neon } from '@neondatabase/serverless';
+import { drizzle } from 'drizzle-orm/neon-http';
 import * as schema from '@shared/schema';
 import dotenv from 'dotenv';
 
 // Load environment variables
 dotenv.config();
 
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_ANON_KEY;
-
-if (!supabaseUrl || !supabaseKey) {
-  throw new Error('Missing Supabase credentials');
-}
-
-// Create Supabase client
-export const supabase = createClient(supabaseUrl, supabaseKey);
-
-// Create Postgres connection for Drizzle
-const connectionString = `postgres://postgres.iyrpcjtxdhgvbrizpzir:${process.env.SUPABASE_DB_PASSWORD}@aws-0-us-west-1.pooler.supabase.com:5432/postgres?sslmode=require`;
-
-const client = postgres(connectionString, {
-  ssl: 'require',
-  max: 1,
-  idle_timeout: 20,
-  connect_timeout: 30,
-  connection: {
-    application_name: 'spicepop'
-  }
+console.log('Current environment variables:', {
+  DATABASE_URL: process.env.DATABASE_URL,
+  NODE_ENV: process.env.NODE_ENV
 });
 
-export const db = drizzle(client, { schema });
+const DATABASE_URL = process.env.DATABASE_URL;
+
+if (!DATABASE_URL) {
+  throw new Error('Environment variable DATABASE_URL is missing. Check your .env file.');
+}
+
+// Create Neon connection
+const sql = neon(DATABASE_URL);
+
+// Create Drizzle instance
+export const db = drizzle(sql, { schema });

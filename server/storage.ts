@@ -25,7 +25,7 @@ import { db } from './db';
 
 export interface IStorage {
   // User operations
-  getUser(id: number): Promise<User | undefined>;
+  getUser(id: string): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
@@ -72,7 +72,7 @@ export interface IStorage {
 
 export class DatabaseStorage implements IStorage {
   // USERS
-  async getUser(id: number): Promise<User | undefined> {
+  async getUser(id: string): Promise<User | undefined> {
     const result = await db.select().from(users).where(eq(users.id, id));
     return result[0];
   }
@@ -301,11 +301,34 @@ export class DatabaseStorage implements IStorage {
   
   // Seed Data Methods
   async seedInitialData() {
-    await this.seedAdmin();
-    await this.seedCategories();
-    await this.seedProducts();
-    await this.seedSettings();
-    await this.seedBlogPosts();
+    try {
+      console.log("Starting seeding process...");
+      
+      console.log("1. Seeding admin...");
+      await this.seedAdmin();
+      console.log("✓ Admin seeded successfully");
+
+      console.log("2. Seeding categories...");
+      await this.seedCategories();
+      console.log("✓ Categories seeded successfully");
+
+      console.log("3. Seeding products...");
+      await this.seedProducts();
+      console.log("✓ Products seeded successfully");
+
+      console.log("4. Seeding settings...");
+      await this.seedSettings();
+      console.log("✓ Settings seeded successfully");
+
+      console.log("5. Seeding blog posts...");
+      await this.seedBlogPosts();
+      console.log("✓ Blog posts seeded successfully");
+
+      console.log("All data seeded successfully!");
+    } catch (error) {
+      console.error("Seeding error:", error);
+      throw error;
+    }
   }
   
   private async seedAdmin() {

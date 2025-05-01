@@ -1,25 +1,25 @@
 {
-  "include": ["client/src/**/*", "shared/**/*", "server/**/*"],
-  "exclude": ["node_modules", "build", "dist", "**/*.test.ts"],
   "compilerOptions": {
-    "incremental": true,
-    "tsBuildInfoFile": "./node_modules/typescript/tsbuildinfo",
-    "noEmit": false,                                  // Allow TypeScript to emit files
-    "outDir": "dist",                                 // Send compiled files to dist/
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "module": "ESNext",
-    "target": "ES2022",                               // Match modern JS standards
-    "strict": true,
-    "lib": ["esnext", "dom", "dom.iterable"],
-    "jsx": "preserve",
-    "esModuleInterop": true,
     "skipLibCheck": true,
+    "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
-    "moduleResolution": "node",                      // Changed from 'bundler' for backend compatibility
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "strict": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noFallthroughCasesInSwitch": true,
     "baseUrl": ".",
-    "types": ["node", "vite/client"],
     "paths": {
-      "@/*": ["./client/src/*"],
-      "@shared/*": ["./shared/*"]
+      "@shared/*": ["shared/*"]
     }
-  }
+  },
+  "include": ["src", "server", "shared", "netlify/functions"],
+  "references": [{ "path": "./tsconfig.node.json" }]
 }
