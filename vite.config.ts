@@ -14,17 +14,10 @@ export default defineConfig({
   root: path.resolve(__dirname, "client"),
   build: {
     outDir: path.resolve(__dirname, "dist/public"),
-    emptyOutDir: true,
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          vendor: ['react', 'react-dom', 'wouter']
-        }
-      }
-    }
+    emptyOutDir: true
   },
   optimizeDeps: {
-    include: ['react', 'react-dom', 'wouter']
+    include: ['react', 'react-dom']
   },
   ssr: {
     noExternal: ['@vitejs/plugin-react']
