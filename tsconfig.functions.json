@@ -2,26 +2,30 @@
   "compilerOptions": {
     "target": "ES2020",
     "module": "ESNext",
-    "lib": ["ES2020"],
-    "strict": true,
+    "moduleResolution": "bundler",
     "esModuleInterop": true,
+    "strict": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "outDir": "netlify/functions",
+    "outDir": "dist/functions",
     "rootDir": ".",
-    "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
-    "noEmit": true,
     "baseUrl": ".",
     "paths": {
-      "@shared/*": ["shared/*"],
-      "@server/*": ["server/*"]
-    }
+      "@server/*": ["server/*"],
+      "@shared/*": ["shared/*"]
+    },
+    "allowJs": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true
   },
   "include": [
-    "netlify/functions/**/*.ts",
-    "server/**/*.ts",
-    "shared/**/*.ts"
+    "netlify/functions/**/*",
+    "server/**/*",
+    "shared/**/*"
   ],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
 } 
