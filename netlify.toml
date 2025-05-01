@@ -16,17 +16,7 @@
 
 [functions]
   node_bundler = "esbuild"
-  external_node_modules = [
-    "express",
-    "pg",
-    "cors",
-    "passport",
-    "express-session",
-    "connect-pg-simple",
-    "dotenv",
-    "drizzle-orm",
-    "@neondatabase/serverless"
-  ]
+  external_node_modules = []
 
 [[redirects]]
   from = "/api/*"

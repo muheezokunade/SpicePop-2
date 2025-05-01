@@ -67,11 +67,14 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
   res.status(500).json({ error: 'Something broke!' });
 });
 
-// Export the serverless handler
-export const handler = serverless(app, {
+// Create the serverless handler
+const handler = serverless(app, {
   binary: [
     'application/octet-stream',
     'application/pdf',
     'image/*'
   ]
-}); 
+});
+
+// Export the handler as default
+export default handler; 
