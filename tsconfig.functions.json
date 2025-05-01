@@ -9,10 +9,12 @@
     "forceConsistentCasingInFileNames": true,
     "outDir": "netlify/functions",
     "rootDir": ".",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
     "baseUrl": ".",
     "paths": {
-      "@shared/*": ["shared/*"]
+      "@shared/*": ["shared/*"],
+      "@server/*": ["server/*"]
     }
   },
   "include": [

@@ -16,7 +16,7 @@ app.get('/api/test', (_req, res) => {
 // Import your main Express app
 const initApp = async () => {
   try {
-    const mainApp = await import('../../server/app');
+    const mainApp = await import('@server/app');
     app.use(mainApp.default || mainApp);
   } catch (error) {
     console.error('Failed to load app.ts:', error);
