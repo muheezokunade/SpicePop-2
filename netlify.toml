@@ -1,36 +1,27 @@
 [build]
-  functions = "netlify/functions"
-  publish = "dist/public"
   command = "rm -rf dist && npm install --include=dev && npm run build"
+  publish = "dist/public"
+  functions = "netlify/functions"
 
 [build.environment]
   NODE_VERSION = "20"
   NODE_ENV = "production"
 
 [dev]
-  framework = "vite"
+  command = "npm run dev:frontend"
+  port = 5173
+  targetPort = 5173
   publish = "dist/public"
-  port = 8888
   autoLaunch = true
 
 [functions]
-  external_node_modules = [
-    "express",
-    "@supabase/supabase-js",
-    "postgres",
-    "@neondatabase/serverless",
-    "drizzle-orm",
-    "express-session",
-    "passport",
-    "passport-local"
-  ]
-  node_bundler = "esbuild"
-  included_files = ["server/**/*", ".env"]
+  external_node_modules = ["express", "pg", "cors", "passport", "jsonwebtoken", "bcryptjs", "multer", "sharp", "nodemailer", "stripe", "aws-sdk", "multer-s3", "dotenv", "express-session", "connect-pg-simple", "helmet", "compression", "express-rate-limit", "express-validator", "winston", "morgan", "cron", "node-cron", "nodemailer-express-handlebars", "handlebars", "moment", "uuid", "slugify", "sanitize-html", "cheerio", "puppeteer", "puppeteer-extra", "puppeteer-extra-plugin-stealth", "puppeteer-extra-plugin-adblocker", "puppeteer-extra-plugin-block-resources", "puppeteer-extra-plugin-flash", "puppeteer-extra-plugin-user-preferences", "puppeteer-extra-plugin-user-data-dir", "puppeteer-extra-plugin-anonymize-ua", "puppeteer-extra-plugin-recaptcha", "puppeteer-extra-plugin-font-size", "puppeteer-extra-plugin-user-agent", "puppeteer-extra-plugin-block-resources", "puppeteer-extra-plugin-flash", "puppeteer-extra-plugin-user-preferences", "puppeteer-extra-plugin-user-data-dir", "puppeteer-extra-plugin-anonymize-ua", "puppeteer-extra-plugin-recaptcha", "puppeteer-extra-plugin-font-size", "puppeteer-extra-plugin-user-agent"]
 
 [[redirects]]
   from = "/api/*"
   to = "/.netlify/functions/server/:splat"
   status = 200
+  force = true
 
 [[redirects]]
   from = "/*"
