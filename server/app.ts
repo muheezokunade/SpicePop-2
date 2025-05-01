@@ -1,10 +1,10 @@
-const express = require('express');
-const session = require('express-session');
-const passport = require('passport');
-const { Strategy: LocalStrategy } = require('passport-local');
-const { storage } = require('./storage');
-const { db } = require('./db');
-const dotenv = require('dotenv');
+import express, { Request, Response } from 'express';
+import session from 'express-session';
+import passport from 'passport';
+import { Strategy as LocalStrategy } from 'passport-local';
+import { storage } from './storage';
+import { db } from './db';
+import dotenv from 'dotenv';
 
 // Load environment variables
 dotenv.config();
@@ -34,7 +34,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // Passport local strategy
-passport.use(new LocalStrategy(async (username, password, done) => {
+passport.use(new LocalStrategy(async (username: string, password: string, done: any) => {
   try {
     const user = await storage.getUserByUsername(username);
     if (!user) {
@@ -49,11 +49,11 @@ passport.use(new LocalStrategy(async (username, password, done) => {
   }
 }));
 
-passport.serializeUser((user, done) => {
+passport.serializeUser((user: any, done: any) => {
   done(null, user.id);
 });
 
-passport.deserializeUser(async (id, done) => {
+passport.deserializeUser(async (id: string, done: any) => {
   try {
     const user = await storage.getUser(id);
     done(null, user);
@@ -74,18 +74,18 @@ const initializeDatabase = async () => {
 };
 
 // Routes
-app.post("/api/login", passport.authenticate("local"), (req, res) => {
+app.post("/api/login", passport.authenticate("local"), (req: Request, res: Response) => {
   res.json({ message: "Logged in successfully" });
 });
 
-app.get("/api/logout", (req, res) => {
+app.get("/api/logout", (req: Request, res: Response) => {
   req.logout(() => {
     res.json({ message: "Logged out successfully" });
   });
 });
 
 // Protected route example
-app.get("/api/profile", (req, res) => {
+app.get("/api/profile", (req: Request, res: Response) => {
   if (!req.isAuthenticated()) {
     return res.status(401).json({ message: "Not authenticated" });
   }
@@ -93,7 +93,7 @@ app.get("/api/profile", (req, res) => {
 });
 
 // Categories
-app.get("/api/categories", async (req, res) => {
+app.get("/api/categories", async (req: Request, res: Response) => {
   try {
     const categories = await storage.getCategories();
     res.json(categories);
@@ -102,7 +102,7 @@ app.get("/api/categories", async (req, res) => {
   }
 });
 
-app.get("/api/categories/:slug", async (req, res) => {
+app.get("/api/categories/:slug", async (req: Request, res: Response) => {
   try {
     const category = await storage.getCategoryBySlug(req.params.slug);
     if (!category) {
@@ -115,7 +115,7 @@ app.get("/api/categories/:slug", async (req, res) => {
 });
 
 // Products
-app.get("/api/products", async (req, res) => {
+app.get("/api/products", async (req: Request, res: Response) => {
   try {
     const products = await storage.getProducts();
     res.json(products);
@@ -124,7 +124,7 @@ app.get("/api/products", async (req, res) => {
   }
 });
 
-app.get("/api/products/:slug", async (req, res) => {
+app.get("/api/products/:slug", async (req: Request, res: Response) => {
   try {
     const product = await storage.getProductBySlug(req.params.slug);
     if (!product) {
@@ -136,7 +136,7 @@ app.get("/api/products/:slug", async (req, res) => {
   }
 });
 
-app.get("/api/categories/:categoryId/products", async (req, res) => {
+app.get("/api/categories/:categoryId/products", async (req: Request, res: Response) => {
   try {
     const products = await storage.getProductsByCategory(req.params.categoryId);
     res.json(products);
@@ -146,7 +146,7 @@ app.get("/api/categories/:categoryId/products", async (req, res) => {
 });
 
 // Blog posts
-app.get("/api/blog", async (req, res) => {
+app.get("/api/blog", async (req: Request, res: Response) => {
   try {
     const posts = await storage.getPublishedBlogPosts();
     res.json(posts);
@@ -155,7 +155,7 @@ app.get("/api/blog", async (req, res) => {
   }
 });
 
-app.get("/api/blog/:slug", async (req, res) => {
+app.get("/api/blog/:slug", async (req: Request, res: Response) => {
   try {
     const post = await storage.getBlogPostBySlug(req.params.slug);
     if (!post) {
@@ -168,7 +168,7 @@ app.get("/api/blog/:slug", async (req, res) => {
 });
 
 // Settings
-app.get("/api/settings", async (req, res) => {
+app.get("/api/settings", async (req: Request, res: Response) => {
   try {
     const settings = await storage.getSettings();
     res.json(settings);
@@ -180,4 +180,4 @@ app.get("/api/settings", async (req, res) => {
 // Initialize database on startup
 initializeDatabase();
 
-module.exports = app; 
+export default app; 

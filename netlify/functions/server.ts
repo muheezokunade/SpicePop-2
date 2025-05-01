@@ -1,6 +1,6 @@
-const serverless = require('serverless-http');
-const express = require('express');
-const dotenv = require('dotenv');
+import serverless from 'serverless-http';
+import express, { Request, Response } from 'express';
+import dotenv from 'dotenv';
 
 // Load environment variables
 dotenv.config();
@@ -9,13 +9,13 @@ dotenv.config();
 const app = express();
 
 // Basic route for testing
-app.get('/api/test', (req, res) => {
+app.get('/api/test', (req: Request, res: Response) => {
   res.json({ message: 'API is working!' });
 });
 
 // Import and use the main app routes
 try {
-  const mainApp = require('../../server/app');
+  const mainApp = await import('../../server/app');
   if (mainApp.default) {
     app.use(mainApp.default);
   } else {
@@ -26,6 +26,6 @@ try {
 }
 
 // Export the handler
-module.exports.handler = serverless(app, {
+export const handler = serverless(app, {
   binary: ['application/octet-stream', 'application/x-protobuf', 'image/*']
 }); 
