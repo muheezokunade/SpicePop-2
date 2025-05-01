@@ -1,17 +1,17 @@
-const serverless = require('serverless-http');
-const express = require('express');
-const app = require('../../server/app');
+import serverless from 'serverless-http';
+import express from 'express';
+import app from '../../server/app';
 
 // Create the serverless handler
-const handler = serverless(app, {
+const serverlessHandler = serverless(app, {
   binary: ['application/octet-stream', 'application/x-protobuf', 'image/*']
 });
 
 // Export the handler
-exports.handler = async (event, context) => {
+export const handler = async (event, context) => {
   // Make context available to underlying Express app
   event.requestContext = event.requestContext || {};
   event.requestContext.authorizer = event.requestContext.authorizer || {};
   
-  return handler(event, context);
+  return serverlessHandler(event, context);
 }; 
