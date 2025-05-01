@@ -11,6 +11,7 @@
     "rootDir": ".",
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
+    "noEmit": true,
     "baseUrl": ".",
     "paths": {
       "@shared/*": ["shared/*"],
