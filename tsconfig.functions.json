@@ -1,18 +1,16 @@
 {
   "compilerOptions": {
     "target": "ES2020",
-    "module": "ESNext",
-    "moduleResolution": "bundler",
-    "esModuleInterop": true,
+    "module": "CommonJS",
+    "lib": ["ES2020"],
     "strict": true,
+    "esModuleInterop": true,
     "skipLibCheck": true,
-    "outDir": "dist/functions",
-    "rootDir": ".",
-    "baseUrl": ".",
-    "paths": {
-      "@shared/*": ["shared/*"]
-    }
+    "forceConsistentCasingInFileNames": true,
+    "outDir": "netlify/functions",
+    "rootDir": "netlify/functions",
+    "moduleResolution": "node"
   },
-  "include": ["netlify/functions/**/*", "server/**/*", "shared/**/*"],
-  "exclude": ["node_modules", "dist"]
+  "include": ["netlify/functions/**/*.ts"],
+  "exclude": ["node_modules"]
 } 
