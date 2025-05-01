@@ -25,5 +25,8 @@ export default defineConfig({
   },
   optimizeDeps: {
     include: ['react', 'react-dom', 'react-router-dom']
+  },
+  ssr: {
+    noExternal: ['@vitejs/plugin-react']
   }
 });
