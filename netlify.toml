@@ -1,7 +1,7 @@
 [build]
   functions = "netlify/functions"
   publish = "dist/public"
-  command = "npm install --include=dev && npm run build"
+  command = "rm -rf dist && npm install --include=dev && npm run build"
 
 [build.environment]
   NODE_VERSION = "20"
