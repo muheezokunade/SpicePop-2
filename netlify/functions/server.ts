@@ -17,10 +17,11 @@ app.get('/api/test', (req: Request, res: Response) => {
 const initApp = async () => {
   try {
     const mainApp = await import('../../server/app');
-    if (mainApp.default) {
-      app.use(mainApp.default);
+    const importedApp = mainApp.default || mainApp;
+    if (importedApp && typeof importedApp === 'function') {
+      app.use('/', importedApp);
     } else {
-      app.use(mainApp);
+      console.error('Invalid app import:', importedApp);
     }
   } catch (error) {
     console.error('Error loading main app:', error);
