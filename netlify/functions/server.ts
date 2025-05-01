@@ -14,16 +14,21 @@ app.get('/api/test', (req: Request, res: Response) => {
 });
 
 // Import and use the main app routes
-try {
-  const mainApp = await import('../../server/app');
-  if (mainApp.default) {
-    app.use(mainApp.default);
-  } else {
-    app.use(mainApp);
+const initApp = async () => {
+  try {
+    const mainApp = await import('../../server/app');
+    if (mainApp.default) {
+      app.use(mainApp.default);
+    } else {
+      app.use(mainApp);
+    }
+  } catch (error) {
+    console.error('Error loading main app:', error);
   }
-} catch (error) {
-  console.error('Error loading main app:', error);
-}
+};
+
+// Initialize the app
+initApp();
 
 // Export the handler
 export const handler = serverless(app, {
