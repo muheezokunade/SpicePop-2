@@ -6,6 +6,14 @@
   NODE_VERSION = "20"
   VITE_API_URL = "/api"
 
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    Content-Security-Policy = "default-src 'self'; img-src 'self' data: https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; script-src 'self' 'unsafe-inline' 'unsafe-eval'; connect-src 'self' https://spicepop-backend.onrender.com;"
+    X-Content-Type-Options = "nosniff"
+
 [[redirects]]
   from = "/api/*"
   to = "https://spicepop-backend.onrender.com/api/:splat"
