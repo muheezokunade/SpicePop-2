@@ -27,8 +27,8 @@ app.use(limiter);
 // CORS configuration
 app.use(cors({
   origin: process.env.NODE_ENV === 'production' 
-    ? ['https://your-production-domain.com'] 
-    : ['http://localhost:5173'],
+    ? ['https://spicepop.netlify.app']
+    : ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:5175'],
   credentials: true
 }));
 
@@ -263,6 +263,11 @@ app.get("/api/settings", async (req: Request, res: Response) => {
   } catch (error) {
     res.status(500).json({ message: "Error fetching settings" });
   }
+});
+
+// Health check endpoint
+app.get('/api/health', (_, res) => {
+  res.status(200).json({ status: 'ok' });
 });
 
 // Initialize database on startup

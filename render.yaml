@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: spicepop-backend
+    env: node
+    region: ohio
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm run start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: VITE_API_URL
+        value: /api
+    headers:
+      - path: /*
+        name: Access-Control-Allow-Origin
+        value: https://spicepop.netlify.app 
