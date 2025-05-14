@@ -306,6 +306,45 @@ app.get("/api/products/:id", async (req: Request, res: Response) => {
   }
 });
 
+// Add POST endpoint for products
+app.post("/api/products", requireAuth, async (req: Request, res: Response) => {
+  try {
+    const product = await storage.createProduct(req.body);
+    res.status(201).json(product);
+  } catch (error) {
+    console.error("Error creating product:", error);
+    res.status(500).json({ message: "Error creating product" });
+  }
+});
+
+// Add PUT endpoint for products
+app.put("/api/products/:id", requireAuth, async (req: Request, res: Response) => {
+  try {
+    const product = await storage.updateProduct(req.params.id, req.body);
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+    res.json(product);
+  } catch (error) {
+    console.error("Error updating product:", error);
+    res.status(500).json({ message: "Error updating product" });
+  }
+});
+
+// Add DELETE endpoint for products
+app.delete("/api/products/:id", requireAuth, async (req: Request, res: Response) => {
+  try {
+    const result = await storage.deleteProduct(req.params.id);
+    if (!result) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+    res.status(204).send();
+  } catch (error) {
+    console.error("Error deleting product:", error);
+    res.status(500).json({ message: "Error deleting product" });
+  }
+});
+
 app.get("/api/categories/:categoryId/products", async (req: Request, res: Response) => {
   try {
     const products = await storage.getProductsByCategory(req.params.categoryId);
