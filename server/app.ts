@@ -1,16 +1,45 @@
-import express, { Request, Response } from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import session from 'express-session';
 import passport from 'passport';
 import { Strategy as LocalStrategy } from 'passport-local';
 import { storage } from './storage';
 import { db } from './db';
 import dotenv from 'dotenv';
+import bcrypt from 'bcryptjs';
+import rateLimit from 'express-rate-limit';
+import cors from 'cors';
 
 // Load environment variables
 dotenv.config();
 
 // Initialize express app
 const app = express();
+
+// Security middleware
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100 // limit each IP to 100 requests per windowMs
+});
+
+// Apply rate limiting to all routes
+app.use(limiter);
+
+// CORS configuration
+app.use(cors({
+  origin: process.env.NODE_ENV === 'production' 
+    ? ['https://your-production-domain.com'] 
+    : ['http://localhost:5173'],
+  credentials: true
+}));
+
+// Error handling middleware
+app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+  console.error(err.stack);
+  res.status(500).json({ 
+    message: 'Internal Server Error',
+    error: process.env.NODE_ENV === 'development' ? err.message : undefined
+  });
+});
 
 // Middleware
 app.use(express.json());
@@ -40,9 +69,13 @@ passport.use(new LocalStrategy(async (username: string, password: string, done: 
     if (!user) {
       return done(null, false, { message: "Incorrect username." });
     }
-    if (user.password !== password) {
+    
+    // Compare hashed password
+    const isValidPassword = await bcrypt.compare(password, user.password);
+    if (!isValidPassword) {
       return done(null, false, { message: "Incorrect password." });
     }
+    
     return done(null, user);
   } catch (error) {
     return done(error);
@@ -74,8 +107,63 @@ const initializeDatabase = async () => {
 };
 
 // Routes
-app.post("/api/login", passport.authenticate("local"), (req: Request, res: Response) => {
-  res.json({ message: "Logged in successfully" });
+app.post("/api/auth/login", async (req: Request, res: Response) => {
+  try {
+    const { username, password } = req.body;
+    
+    if (!username || !password) {
+      return res.status(400).json({ message: 'Username and password are required' });
+    }
+    
+    const user = await storage.getUserByUsername(username);
+    
+    if (!user || user.password !== password) {
+      return res.status(401).json({ message: 'Invalid credentials' });
+    }
+    
+    // Set auth in header for future requests
+    res.setHeader('Authorization', `Basic ${Buffer.from(`${username}:${password}`).toString('base64')}`);
+    
+    // Don't send password back to client
+    const { password: _, ...userWithoutPassword } = user;
+    
+    res.json(userWithoutPassword);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+app.get("/api/auth/check", async (req: Request, res: Response) => {
+  try {
+    const authHeader = req.headers.authorization;
+    
+    if (!authHeader || !authHeader.startsWith('Basic ')) {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
+    
+    // Decode credentials
+    const base64Credentials = authHeader.split(' ')[1];
+    const credentials = Buffer.from(base64Credentials, 'base64').toString('utf-8');
+    const [username, password] = credentials.split(':');
+    
+    if (!username || !password) {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
+    
+    // Check if valid admin user
+    const user = await storage.getUserByUsername(username);
+    
+    if (!user || user.password !== password || !user.isAdmin) {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
+    
+    // Don't send password back to client
+    const { password: _, ...userWithoutPassword } = user;
+    
+    res.json(userWithoutPassword);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
+  }
 });
 
 app.get("/api/logout", (req: Request, res: Response) => {
