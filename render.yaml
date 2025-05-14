@@ -5,9 +5,9 @@ services:
     region: ohio
     plan: free
     buildCommand: |
-      npm install --include=dev
+      npm install --omit=dev
       npm run build:server
-    startCommand: npm run start
+    startCommand: NODE_ENV=production node dist/server/index.js
     healthCheckPath: /api/health
     envVars:
       - key: NODE_ENV
@@ -16,8 +16,8 @@ services:
         sync: false
       - key: SESSION_SECRET
         generateValue: true
-      - key: VITE_API_URL
-        value: /api
+      - key: PORT
+        value: 3000
     headers:
       - path: /*
         name: Access-Control-Allow-Origin
