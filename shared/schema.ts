@@ -130,3 +130,13 @@ export type CartItem = {
 };
 
 export type OrderStatus = 'pending' | 'paid' | 'shipped' | 'delivered';
+
+// At the end of the file, add export for tables
+export const schema = {
+  users,
+  categories,
+  products,
+  orders,
+  settings,
+  blogPosts
+};

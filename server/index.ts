@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import app from './app';
+import app from './app.js';
 
 // Handle paths in both serverless and local environments
 let __dirname = '.';

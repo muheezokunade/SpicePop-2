@@ -1,6 +1,6 @@
 import express, { type Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
-import { storage } from "./storage";
+import { storage } from "./storage.js";
 import { z } from "zod";
 import { 
   insertCategorySchema, 
@@ -8,7 +8,7 @@ import {
   insertOrderSchema,
   insertUserSchema,
   insertBlogPostSchema
-} from "@shared/schema";
+} from "../shared/schema.js";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   const router = express.Router();

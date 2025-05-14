@@ -20,8 +20,8 @@ import {
   orders,
   settings,
   blogPosts,
-} from "@shared/schema";
-import { db } from './db';
+} from "../shared/schema.js";
+import { db } from './db.js';
 
 export interface IStorage {
   // User operations
