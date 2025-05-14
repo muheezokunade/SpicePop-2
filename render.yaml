@@ -4,8 +4,8 @@ services:
     env: node
     region: ohio
     plan: free
-    buildCommand: npm ci --omit=dev && npm i typescript tsx -D && npm run build:server
-    startCommand: NODE_ENV=production node dist/server/index.js
+    buildCommand: npm install && npm run build:server
+    startCommand: npm run start
     healthCheckPath: /api/health
     envVars:
       - key: NODE_ENV
@@ -14,9 +14,8 @@ services:
         sync: false
       - key: SESSION_SECRET
         generateValue: true
-      - key: PORT
-        value: 3000
     headers:
       - path: /*
         name: Access-Control-Allow-Origin
-        value: https://spicepopp.netlify.app 
+        value: https://spicepopp.netlify.app
+    autoDeploy: true 
