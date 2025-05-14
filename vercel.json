@@ -24,7 +24,7 @@
   },
   "functions": {
     "dist/index.js": {
-      "includeFiles": "dist/client/**"
+      "includeFiles": "dist/client/**/*"
     }
   }
 }
