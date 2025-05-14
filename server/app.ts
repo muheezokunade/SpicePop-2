@@ -27,9 +27,11 @@ app.use(limiter);
 // CORS configuration
 app.use(cors({
   origin: process.env.NODE_ENV === 'production' 
-    ? ['https://spicepopp.netlify.app']
+    ? ['https://spicepopp.netlify.app', 'https://spicepop-backend.onrender.com']
     : ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:5175'],
-  credentials: true
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 // Error handling middleware
@@ -103,6 +105,33 @@ const initializeDatabase = async () => {
     await storage.seedInitialData();
   } catch (error) {
     console.error("Error initializing database:", error);
+  }
+};
+
+// Add this middleware for authorization
+const requireAuth = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const authHeader = req.headers.authorization;
+    
+    if (!authHeader || !authHeader.startsWith('Basic ')) {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
+    
+    // Decode credentials
+    const base64Credentials = authHeader.split(' ')[1];
+    const credentials = Buffer.from(base64Credentials, 'base64').toString('utf-8');
+    const [username, password] = credentials.split(':');
+    
+    // Check if valid admin user
+    const user = await storage.getUserByUsername(username);
+    
+    if (!user || user.password !== password || !user.isAdmin) {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
+    
+    next();
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
@@ -187,6 +216,45 @@ app.get("/api/categories", async (req: Request, res: Response) => {
     res.json(categories);
   } catch (error) {
     res.status(500).json({ message: "Error fetching categories" });
+  }
+});
+
+// Add the POST endpoint for categories
+app.post("/api/categories", requireAuth, async (req: Request, res: Response) => {
+  try {
+    const category = await storage.createCategory(req.body);
+    res.status(201).json(category);
+  } catch (error) {
+    console.error("Error creating category:", error);
+    res.status(500).json({ message: "Error creating category" });
+  }
+});
+
+// Add the PUT endpoint for categories
+app.put("/api/categories/:id", requireAuth, async (req: Request, res: Response) => {
+  try {
+    const category = await storage.updateCategory(req.params.id, req.body);
+    if (!category) {
+      return res.status(404).json({ message: "Category not found" });
+    }
+    res.json(category);
+  } catch (error) {
+    console.error("Error updating category:", error);
+    res.status(500).json({ message: "Error updating category" });
+  }
+});
+
+// Add the DELETE endpoint for categories
+app.delete("/api/categories/:id", requireAuth, async (req: Request, res: Response) => {
+  try {
+    const result = await storage.deleteCategory(req.params.id);
+    if (!result) {
+      return res.status(404).json({ message: "Category not found" });
+    }
+    res.status(204).send();
+  } catch (error) {
+    console.error("Error deleting category:", error);
+    res.status(500).json({ message: "Error deleting category" });
   }
 });
 
