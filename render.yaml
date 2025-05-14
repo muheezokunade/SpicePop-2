@@ -5,7 +5,8 @@ services:
     region: ohio
     plan: free
     buildCommand: |
-      npm install --omit=dev
+      npm ci --omit=dev
+      npm i typescript tsx -D
       npm run build:server
     startCommand: NODE_ENV=production node dist/server/index.js
     healthCheckPath: /api/health
@@ -21,4 +22,4 @@ services:
     headers:
       - path: /*
         name: Access-Control-Allow-Origin
-        value: https://spicepop.netlify.app 
+        value: https://spicepopp.netlify.app 
