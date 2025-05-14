@@ -41,7 +41,7 @@ const productFormSchema = z.object({
   price: z.string().refine(val => !isNaN(parseFloat(val)) && parseFloat(val) > 0, 'Price must be a positive number'),
   stock: z.coerce.number().int().min(0, 'Stock must be 0 or greater'),
   imageUrl: z.string().optional(),
-  categoryId: z.string().min(1, 'Category is required'),
+  categoryId: z.string().min(1, 'Category is required').nullable(),
   isFeatured: z.boolean().default(false),
 });
 
@@ -78,7 +78,7 @@ export default function ProductForm({ productId }: ProductFormProps) {
       price: '',
       stock: 0,
       imageUrl: '',
-      categoryId: '',
+      categoryId: null,
       isFeatured: false,
     },
   });
@@ -93,7 +93,7 @@ export default function ProductForm({ productId }: ProductFormProps) {
         price: product.price.toString(),
         stock: product.stock,
         imageUrl: product.imageUrl || '',
-        categoryId: product.categoryId || '',
+        categoryId: product.categoryId || null,
         isFeatured: product.isFeatured,
       });
     }

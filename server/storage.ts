@@ -365,10 +365,10 @@ export class DatabaseStorage implements IStorage {
     if (existingProducts.length === 0) {
       // Get category IDs
       const categories = await this.getCategories();
-      const spicesCategoryId = categories.find(c => c.slug === 'spices')?.id || '';
-      const saucesCategoryId = categories.find(c => c.slug === 'sauces-pastes')?.id || '';
-      const grainsCategoryId = categories.find(c => c.slug === 'grains-rice')?.id || '';
-      const snacksCategoryId = categories.find(c => c.slug === 'snacks')?.id || '';
+      const spicesCategoryId = categories.find(c => c.slug === 'spices')?.id || null;
+      const saucesCategoryId = categories.find(c => c.slug === 'sauces-pastes')?.id || null;
+      const grainsCategoryId = categories.find(c => c.slug === 'grains-rice')?.id || null;
+      const snacksCategoryId = categories.find(c => c.slug === 'snacks')?.id || null;
       
       const products: InsertProduct[] = [
         {
@@ -497,8 +497,8 @@ export class DatabaseStorage implements IStorage {
 
         // Get category IDs
         const categories = await this.getCategories();
-        const spicesCategoryId = categories.find(c => c.slug === 'spices')?.id || '';
-        const recipesCategoryId = categories.find(c => c.slug === 'recipe-bundles')?.id || '';
+        const spicesCategoryId = categories.find(c => c.slug === 'spices')?.id || null;
+        const recipesCategoryId = categories.find(c => c.slug === 'recipe-bundles')?.id || null;
         
         const blogPosts: InsertBlogPost[] = [
           {

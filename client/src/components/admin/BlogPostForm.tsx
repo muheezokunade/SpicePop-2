@@ -47,7 +47,7 @@ const blogPostFormSchema = insertBlogPostSchema.extend({
   excerpt: z.string().min(10, 'Excerpt must be at least 10 characters'),
   content: z.string().min(30, 'Content must be at least 30 characters'),
   imageUrl: z.string().optional().nullable(),
-  categoryId: z.string().min(1, 'Category is required'),
+  categoryId: z.string().min(1, 'Category is required').nullable(),
   published: z.boolean().default(true),
   slug: z.string().optional(),
 });
@@ -80,7 +80,7 @@ export default function BlogPostForm({ post, isEdit = false }: BlogPostFormProps
       excerpt: post?.excerpt || '',
       content: post?.content || '',
       imageUrl: post?.imageUrl || undefined,
-      categoryId: post?.categoryId || '',
+      categoryId: post?.categoryId || null,
       published: post?.published ?? true,
     },
   });
