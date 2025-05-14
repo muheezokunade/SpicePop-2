@@ -280,14 +280,28 @@ app.get("/api/products", async (req: Request, res: Response) => {
   }
 });
 
-app.get("/api/products/:slug", async (req: Request, res: Response) => {
+app.get("/api/products/:id", async (req: Request, res: Response) => {
   try {
-    const product = await storage.getProductBySlug(req.params.slug);
-    if (!product) {
-      return res.status(404).json({ message: "Product not found" });
+    // First check if the parameter is a UUID (ID)
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    
+    if (uuidRegex.test(req.params.id)) {
+      // It's an ID, get by ID
+      const product = await storage.getProduct(req.params.id);
+      if (!product) {
+        return res.status(404).json({ message: "Product not found" });
+      }
+      return res.json(product);
+    } else {
+      // It's a slug, get by slug
+      const product = await storage.getProductBySlug(req.params.id);
+      if (!product) {
+        return res.status(404).json({ message: "Product not found" });
+      }
+      return res.json(product);
     }
-    res.json(product);
   } catch (error) {
+    console.error("Error fetching product:", error);
     res.status(500).json({ message: "Error fetching product" });
   }
 });
