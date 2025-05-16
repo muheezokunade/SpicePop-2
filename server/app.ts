@@ -249,12 +249,52 @@ app.get("/api/profile", (req: Request, res: Response) => {
   res.json(req.user);
 });
 
+// Cache objects
+let categoriesCache: any[] = [];
+let productCache: any[] = [];
+let lastCategoriesFetch = 0;
+let lastProductsFetch = 0;
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
+// Cache for products by category
+const productsByCategoryCache: Record<string, { data: any[], timestamp: number }> = {};
+
+// Helper function to add request timeout
+const withTimeout = async <T>(promise: Promise<T>, timeoutMs: number = 10000): Promise<T> => {
+  return Promise.race([
+    promise,
+    new Promise<T>((_, reject) => 
+      setTimeout(() => reject(new Error(`Request timed out after ${timeoutMs}ms`)), timeoutMs)
+    )
+  ]) as Promise<T>;
+};
+
 // Categories
 app.get("/api/categories", async (req: Request, res: Response) => {
+  const now = Date.now();
   try {
-    const categories = await storage.getCategories();
+    // Return cached data if still valid
+    if (categoriesCache.length > 0 && now - lastCategoriesFetch < CACHE_TTL) {
+      return res.json(categoriesCache);
+    }
+    
+    // Set timeout to 5 seconds
+    const categories = await withTimeout(storage.getCategories(), 5000);
+    
+    // Update cache
+    categoriesCache = categories;
+    lastCategoriesFetch = now;
+    
     res.json(categories);
   } catch (error) {
+    console.error("Error fetching categories:", error);
+    
+    // If we have a cache but it's expired, still use it in case of errors
+    if (categoriesCache.length > 0) {
+      console.log("Serving stale categories cache due to error");
+      return res.json(categoriesCache);
+    }
+    
     res.status(500).json({ message: "Error fetching categories" });
   }
 });
@@ -312,10 +352,30 @@ app.get("/api/categories/:slug", async (req: Request, res: Response) => {
 
 // Products
 app.get("/api/products", async (req: Request, res: Response) => {
+  const now = Date.now();
   try {
-    const products = await storage.getProducts();
+    // Return cached data if still valid
+    if (productCache.length > 0 && now - lastProductsFetch < CACHE_TTL) {
+      return res.json(productCache);
+    }
+    
+    // Set timeout to 5 seconds
+    const products = await withTimeout(storage.getProducts(), 5000);
+    
+    // Update cache
+    productCache = products;
+    lastProductsFetch = now;
+    
     res.json(products);
   } catch (error) {
+    console.error("Error fetching products:", error);
+    
+    // If we have a cache but it's expired, still use it in case of errors
+    if (productCache.length > 0) {
+      console.log("Serving stale products cache due to error");
+      return res.json(productCache);
+    }
+    
     res.status(500).json({ message: "Error fetching products" });
   }
 });
@@ -386,10 +446,36 @@ app.delete("/api/products/:id", requireAuth, async (req: Request, res: Response)
 });
 
 app.get("/api/categories/:categoryId/products", async (req: Request, res: Response) => {
+  const categoryId = req.params.categoryId;
+  const now = Date.now();
+  
   try {
-    const products = await storage.getProductsByCategory(req.params.categoryId);
+    // Check cache first
+    const cachedData = productsByCategoryCache[categoryId];
+    if (cachedData && now - cachedData.timestamp < CACHE_TTL) {
+      return res.json(cachedData.data);
+    }
+    
+    // Set timeout to 5 seconds
+    const products = await withTimeout(storage.getProductsByCategory(categoryId), 5000);
+    
+    // Update cache
+    productsByCategoryCache[categoryId] = {
+      data: products,
+      timestamp: now
+    };
+    
     res.json(products);
   } catch (error) {
+    console.error(`Error fetching products for category ${categoryId}:`, error);
+    
+    // If we have a cache but it's expired, still use it in case of errors
+    const cachedData = productsByCategoryCache[categoryId];
+    if (cachedData) {
+      console.log(`Serving stale products cache for category ${categoryId} due to error`);
+      return res.json(cachedData.data);
+    }
+    
     res.status(500).json({ message: "Error fetching products" });
   }
 });
@@ -440,6 +526,42 @@ app.get('/status', (_, res) => {
     nodeVersion: process.version
   });
 });
+
+// Middleware to apply timeout to all API requests
+const timeoutMiddleware = (timeout = 15000) => (req: Request, res: Response, next: NextFunction) => {
+  // Only apply timeout to API routes
+  if (!req.path.startsWith('/api/')) {
+    return next();
+  }
+  
+  // Set a timeout to automatically respond if the request takes too long
+  const timeoutId = setTimeout(() => {
+    console.error(`Request to ${req.method} ${req.path} timed out after ${timeout}ms`);
+    
+    // Check if response has already been sent
+    if (res.headersSent) {
+      return;
+    }
+    
+    res.status(504).json({
+      error: 'Gateway Timeout',
+      message: 'The request took too long to process'
+    });
+  }, timeout);
+  
+  // Clear the timeout when the response is sent
+  const originalEnd = res.end;
+  // @ts-ignore - We're monkey patching the response object
+  res.end = function(chunk: any, encoding: BufferEncoding, callback?: () => void) {
+    clearTimeout(timeoutId);
+    return originalEnd.call(this, chunk, encoding, callback);
+  };
+  
+  next();
+};
+
+// Apply the timeout middleware before routes
+app.use(timeoutMiddleware(15000)); // 15 second timeout
 
 // Initialize database on startup
 initializeDatabase();

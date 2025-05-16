@@ -211,7 +211,23 @@ export class DatabaseStorage implements IStorage {
   
   // PRODUCTS
   async getProducts(): Promise<Product[]> {
-    return db.select().from(products);
+    try {
+      return await this.throttleDbRequest(async () => {
+        // Add a timeout to the database query
+        const timeoutPromise = new Promise<Product[]>((_, reject) => {
+          setTimeout(() => reject(new Error('Database query timed out')), 4000);
+        });
+        
+        const queryPromise = db.select().from(products);
+        
+        // Race between query and timeout
+        return Promise.race([queryPromise, timeoutPromise]);
+      });
+    } catch (error) {
+      console.error('Error in getProducts:', error);
+      // Return empty array instead of failing
+      return [];
+    }
   }
   
   async getProduct(id: string): Promise<Product | undefined> {
@@ -225,7 +241,23 @@ export class DatabaseStorage implements IStorage {
   }
   
   async getProductsByCategory(categoryId: string): Promise<Product[]> {
-    return db.select().from(products).where(eq(products.categoryId, categoryId));
+    try {
+      return await this.throttleDbRequest(async () => {
+        // Add a timeout to the database query
+        const timeoutPromise = new Promise<Product[]>((_, reject) => {
+          setTimeout(() => reject(new Error('Database query timed out')), 4000);
+        });
+        
+        const queryPromise = db.select().from(products).where(eq(products.categoryId, categoryId));
+        
+        // Race between query and timeout
+        return Promise.race([queryPromise, timeoutPromise]);
+      });
+    } catch (error) {
+      console.error(`Error in getProductsByCategory for ${categoryId}:`, error);
+      // Return empty array instead of failing
+      return [];
+    }
   }
   
   async getFeaturedProducts(): Promise<Product[]> {
