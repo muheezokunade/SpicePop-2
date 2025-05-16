@@ -71,20 +71,58 @@ export interface IStorage {
 }
 
 export class DatabaseStorage implements IStorage {
+  // Function to help throttle database requests
+  private dbRequestQueue: Promise<any> = Promise.resolve();
+  private async throttleDbRequest<T>(fn: () => Promise<T>): Promise<T> {
+    // Chain requests to ensure they're executed in sequence with a delay
+    this.dbRequestQueue = this.dbRequestQueue.then(async () => {
+      // Add a small delay between DB operations
+      await new Promise(resolve => setTimeout(resolve, 100));
+      return fn();
+    }).catch(() => {
+      // If one request fails, don't block the queue
+      return Promise.resolve();
+    });
+    return this.dbRequestQueue as Promise<T>;
+  }
+
   // USERS
   async getUser(id: string): Promise<User | undefined> {
-    const result = await db.select().from(users).where(eq(users.id, id));
-    return result[0];
+    try {
+      return await this.throttleDbRequest(async () => {
+        const result = await db.select().from(users).where(eq(users.id, id));
+        return result[0];
+      });
+    } catch (error) {
+      console.error(`Error in getUser for ${id}:`, error);
+      return undefined;
+    }
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    const result = await db.select().from(users).where(eq(users.username, username));
-    return result[0];
+    try {
+      // Use throttling to prevent rate limits
+      return await this.throttleDbRequest(async () => {
+        const result = await db.select().from(users).where(eq(users.username, username));
+        return result[0];
+      });
+    } catch (error) {
+      console.error(`Error in getUserByUsername for ${username}:`, error);
+      // Return undefined to allow the app to continue
+      return undefined;
+    }
   }
   
   async getUserByEmail(email: string): Promise<User | undefined> {
-    const result = await db.select().from(users).where(eq(users.email, email));
-    return result[0];
+    try {
+      return await this.throttleDbRequest(async () => {
+        const result = await db.select().from(users).where(eq(users.email, email));
+        return result[0];
+      });
+    } catch (error) {
+      console.error(`Error in getUserByEmail for ${email}:`, error);
+      return undefined;
+    }
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
@@ -115,7 +153,14 @@ export class DatabaseStorage implements IStorage {
   
   // CATEGORIES
   async getCategories(): Promise<Category[]> {
-    return db.select().from(categories);
+    try {
+      return await this.throttleDbRequest(async () => {
+        return db.select().from(categories);
+      });
+    } catch (error) {
+      console.error('Error in getCategories:', error);
+      return [];
+    }
   }
   
   async getCategory(id: string): Promise<Category | undefined> {
@@ -373,7 +418,7 @@ export class DatabaseStorage implements IStorage {
       // Try to check if admin exists
       let existingAdmin;
       try {
-        existingAdmin = await this.getUserByUsername('admin');
+        existingAdmin = await this.withRateLimitRetry(() => this.getUserByUsername('admin'));
       } catch (error) {
         console.error("Error checking for existing admin:", error);
         // If we can't check, assume we need to create it
@@ -382,12 +427,14 @@ export class DatabaseStorage implements IStorage {
       
       if (!existingAdmin) {
         console.log("Creating admin user...");
-        await this.createUser({
-          username: 'admin',
-          password: 'ikeoluwapo',
-          email: 'imanbusayo@gmail.com',
-          isAdmin: true
-        });
+        await this.withRateLimitRetry(() => 
+          this.createUser({
+            username: 'admin',
+            password: 'ikeoluwapo',
+            email: 'imanbusayo@gmail.com',
+            isAdmin: true
+          })
+        );
       } else {
         console.log("Admin user already exists");
       }
@@ -397,160 +444,216 @@ export class DatabaseStorage implements IStorage {
     }
   }
   
-  private async seedCategories() {
-    const existingCategories = await this.getCategories();
-    if (existingCategories.length === 0) {
-      const categories: InsertCategory[] = [
-        { name: 'Spices', slug: 'spices', imageUrl: 'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=800&q=80' },
-        { name: 'Grains & Rice', slug: 'grains-rice', imageUrl: 'https://images.unsplash.com/photo-1586201375761-83865001e8d6?w=800&q=80' },
-        { name: 'Sauces & Pastes', slug: 'sauces-pastes', imageUrl: 'https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=800&q=80' },
-        { name: 'Snacks', slug: 'snacks', imageUrl: 'https://images.unsplash.com/photo-1566478989037-eec170784d0b?w=800&q=80' },
-        { name: 'Recipe Bundles', slug: 'recipe-bundles', imageUrl: 'https://images.unsplash.com/photo-1509358271058-acd22cc93898?w=800&q=80' }
-      ];
-      
-      for (const category of categories) {
-        await this.createCategory(category);
+  // Helper functions for handling rate limits
+  private async retryWithBackoff<T>(operation: () => Promise<T>, maxRetries = 3): Promise<T> {
+    let lastError;
+    for (let attempt = 0; attempt < maxRetries; attempt++) {
+      try {
+        return await operation();
+      } catch (error: any) {
+        lastError = error;
+        // Check if it's a rate limit error
+        if (error && typeof error === 'object' && error.message && 
+            (error.message.includes('rate limit') || error.message.includes('429'))) {
+          const delayMs = Math.pow(2, attempt) * 1000; // Exponential backoff
+          console.log(`Rate limit hit. Retrying in ${delayMs}ms. Attempt ${attempt + 1}/${maxRetries}`);
+          await new Promise(resolve => setTimeout(resolve, delayMs));
+          continue;
+        }
+        // If it's not a rate limit error, throw immediately
+        throw error;
       }
+    }
+    // If we've exhausted all retries
+    throw lastError;
+  }
+
+  private async withRateLimitRetry<T>(operation: () => Promise<T>): Promise<T> {
+    return this.retryWithBackoff(operation, 5);
+  }
+
+  private async seedCategories() {
+    try {
+      const existingCategories = await this.withRateLimitRetry(() => this.getCategories());
+      
+      if (existingCategories.length === 0) {
+        const categories: InsertCategory[] = [
+          { name: 'Spices', slug: 'spices', imageUrl: 'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=800&q=80' },
+          { name: 'Grains & Rice', slug: 'grains-rice', imageUrl: 'https://images.unsplash.com/photo-1586201375761-83865001e8d6?w=800&q=80' },
+          { name: 'Sauces & Pastes', slug: 'sauces-pastes', imageUrl: 'https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=800&q=80' },
+          { name: 'Snacks', slug: 'snacks', imageUrl: 'https://images.unsplash.com/photo-1566478989037-eec170784d0b?w=800&q=80' },
+          { name: 'Recipe Bundles', slug: 'recipe-bundles', imageUrl: 'https://images.unsplash.com/photo-1509358271058-acd22cc93898?w=800&q=80' }
+        ];
+        
+        // Process categories one by one with delay to avoid rate limits
+        for (const category of categories) {
+          await this.withRateLimitRetry(() => this.createCategory(category));
+          // Add a small delay between operations to avoid rate limits
+          await new Promise(resolve => setTimeout(resolve, 500));
+        }
+      }
+    } catch (error) {
+      console.error("Error in seedCategories with retry:", error);
+      throw error;
     }
   }
   
   private async seedProducts() {
-    const existingProducts = await this.getProducts();
-    if (existingProducts.length === 0) {
-      // Get category IDs
-      const categories = await this.getCategories();
-      const spicesCategoryId = categories.find(c => c.slug === 'spices')?.id || null;
-      const saucesCategoryId = categories.find(c => c.slug === 'sauces-pastes')?.id || null;
-      const grainsCategoryId = categories.find(c => c.slug === 'grains-rice')?.id || null;
-      const snacksCategoryId = categories.find(c => c.slug === 'snacks')?.id || null;
+    try {
+      const existingProducts = await this.withRateLimitRetry(() => this.getProducts());
       
-      const products: InsertProduct[] = [
-        {
-          name: 'Nigerian Pepper Mix',
-          slug: 'nigerian-pepper-mix',
-          description: 'A perfect blend of scotch bonnet peppers and local spices for your soups and stews.',
-          price: '1500',
-          stock: 50,
-          imageUrl: 'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=800&q=80',
-          categoryId: spicesCategoryId,
-          isFeatured: true
-        },
-        {
-          name: 'Jollof Rice Spice Mix',
-          slug: 'jollof-rice-spice-mix',
-          description: 'All the spices you need to make the perfect Nigerian Jollof rice in one convenient packet.',
-          price: '2200',
-          stock: 35,
-          imageUrl: 'https://images.unsplash.com/photo-1599438245301-173ce6a803c5?w=800&q=80',
-          categoryId: spicesCategoryId,
-          isFeatured: true
-        },
-        {
-          name: 'Premium Ogbono Seeds',
-          slug: 'premium-ogbono-seeds',
-          description: 'High-quality ogbono seeds for making authentic Nigerian ogbono soup.',
-          price: '3800',
-          stock: 20,
-          imageUrl: 'https://images.unsplash.com/photo-1508747323945-2a6097fce5bd?w=800&q=80',
-          categoryId: saucesCategoryId,
-          isFeatured: true
-        },
-        {
-          name: 'Dried Crayfish',
-          slug: 'dried-crayfish',
-          description: 'Essential ingredient for adding rich flavor to Nigerian soups and stews.',
-          price: '2500',
-          stock: 40,
-          imageUrl: 'https://images.unsplash.com/photo-1626082896492-766af4eb6501?w=800&q=80',
-          categoryId: spicesCategoryId,
-          isFeatured: true
-        },
-        {
-          name: 'Ofada Rice',
-          slug: 'ofada-rice',
-          description: 'Premium local Nigerian rice with unique texture and flavor.',
-          price: '3500',
-          stock: 25,
-          imageUrl: 'https://images.unsplash.com/photo-1586201375761-83865001e8d6?w=800&q=80',
-          categoryId: grainsCategoryId,
-          isFeatured: false
-        },
-        {
-          name: 'Egusi Seeds',
-          slug: 'egusi-seeds',
-          description: 'Ground melon seeds for making traditional egusi soup.',
-          price: '2800',
-          stock: 30,
-          imageUrl: 'https://images.unsplash.com/photo-1556910633-5099dc3971e0?w=800&q=80',
-          categoryId: saucesCategoryId,
-          isFeatured: false
-        },
-        {
-          name: 'Plantain Chips',
-          slug: 'plantain-chips',
-          description: 'Crunchy, lightly salted plantain chips made from fresh Nigerian plantains.',
-          price: '1200',
-          stock: 60,
-          imageUrl: 'https://images.unsplash.com/photo-1559471712-e29bb872c2fa?w=800&q=80',
-          categoryId: snacksCategoryId,
-          isFeatured: false
-        },
-        {
-          name: 'Suya Spice Mix',
-          slug: 'suya-spice-mix',
-          description: 'Authentic spice blend for making traditional Nigerian suya at home.',
-          price: '1800',
-          stock: 45,
-          imageUrl: 'https://images.unsplash.com/photo-1589881133595-a3c085cb731d?w=800&q=80',
-          categoryId: spicesCategoryId,
-          isFeatured: false
+      if (existingProducts.length === 0) {
+        // Get category IDs
+        const categories = await this.withRateLimitRetry(() => this.getCategories());
+        const spicesCategoryId = categories.find(c => c.slug === 'spices')?.id || null;
+        const saucesCategoryId = categories.find(c => c.slug === 'sauces-pastes')?.id || null;
+        const grainsCategoryId = categories.find(c => c.slug === 'grains-rice')?.id || null;
+        const snacksCategoryId = categories.find(c => c.slug === 'snacks')?.id || null;
+        
+        const products: InsertProduct[] = [
+          {
+            name: 'Nigerian Pepper Mix',
+            slug: 'nigerian-pepper-mix',
+            description: 'A perfect blend of scotch bonnet peppers and local spices for your soups and stews.',
+            price: '1500',
+            stock: 50,
+            imageUrl: 'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=800&q=80',
+            categoryId: spicesCategoryId,
+            isFeatured: true
+          },
+          {
+            name: 'Jollof Rice Spice Mix',
+            slug: 'jollof-rice-spice-mix',
+            description: 'All the spices you need to make the perfect Nigerian Jollof rice in one convenient packet.',
+            price: '2200',
+            stock: 35,
+            imageUrl: 'https://images.unsplash.com/photo-1599438245301-173ce6a803c5?w=800&q=80',
+            categoryId: spicesCategoryId,
+            isFeatured: true
+          },
+          {
+            name: 'Premium Ogbono Seeds',
+            slug: 'premium-ogbono-seeds',
+            description: 'High-quality ogbono seeds for making authentic Nigerian ogbono soup.',
+            price: '3800',
+            stock: 20,
+            imageUrl: 'https://images.unsplash.com/photo-1508747323945-2a6097fce5bd?w=800&q=80',
+            categoryId: saucesCategoryId,
+            isFeatured: true
+          },
+          {
+            name: 'Dried Crayfish',
+            slug: 'dried-crayfish',
+            description: 'Essential ingredient for adding rich flavor to Nigerian soups and stews.',
+            price: '2500',
+            stock: 40,
+            imageUrl: 'https://images.unsplash.com/photo-1626082896492-766af4eb6501?w=800&q=80',
+            categoryId: spicesCategoryId,
+            isFeatured: true
+          },
+          {
+            name: 'Ofada Rice',
+            slug: 'ofada-rice',
+            description: 'Premium local Nigerian rice with unique texture and flavor.',
+            price: '3500',
+            stock: 25,
+            imageUrl: 'https://images.unsplash.com/photo-1586201375761-83865001e8d6?w=800&q=80',
+            categoryId: grainsCategoryId,
+            isFeatured: false
+          },
+          {
+            name: 'Egusi Seeds',
+            slug: 'egusi-seeds',
+            description: 'Ground melon seeds for making traditional egusi soup.',
+            price: '2800',
+            stock: 30,
+            imageUrl: 'https://images.unsplash.com/photo-1556910633-5099dc3971e0?w=800&q=80',
+            categoryId: saucesCategoryId,
+            isFeatured: false
+          },
+          {
+            name: 'Plantain Chips',
+            slug: 'plantain-chips',
+            description: 'Crunchy, lightly salted plantain chips made from fresh Nigerian plantains.',
+            price: '1200',
+            stock: 60,
+            imageUrl: 'https://images.unsplash.com/photo-1559471712-e29bb872c2fa?w=800&q=80',
+            categoryId: snacksCategoryId,
+            isFeatured: false
+          },
+          {
+            name: 'Suya Spice Mix',
+            slug: 'suya-spice-mix',
+            description: 'Authentic spice blend for making traditional Nigerian suya at home.',
+            price: '1800',
+            stock: 45,
+            imageUrl: 'https://images.unsplash.com/photo-1589881133595-a3c085cb731d?w=800&q=80',
+            categoryId: spicesCategoryId,
+            isFeatured: false
+          }
+        ];
+        
+        // Process products one by one with delay to avoid rate limits
+        for (const product of products) {
+          await this.withRateLimitRetry(() => this.createProduct(product));
+          // Add a small delay between operations to avoid rate limits
+          await new Promise(resolve => setTimeout(resolve, 500));
         }
-      ];
-      
-      for (const product of products) {
-        await this.createProduct(product);
       }
+    } catch (error) {
+      console.error("Error in seedProducts with retry:", error);
+      throw error;
     }
   }
   
   private async seedSettings() {
-    const existingSettings = await this.getSettings();
-    if (existingSettings.length === 0) {
-      const settings: { key: string, value: string }[] = [
-        { key: 'site_name', value: 'SpicePop' },
-        { key: 'site_description', value: 'Nigerian Modern E-Commerce Platform for Spices and Foodstuffs' },
-        { key: 'founder', value: 'Iman Fasasi' },
-        { key: 'contact_email', value: 'info@spicepop.net' },
-        { key: 'contact_phone', value: '+2348068989798' },
-        { key: 'contact_whatsapp', value: '+2348068989798' },
-        { key: 'contact_address', value: '13, Signature estate Ikota, Lekki, Lagos, Nigeria' },
-        { key: 'store_location_1', value: '13, Signature estate Ikota, Lekki, Lagos, Nigeria' },
-        { key: 'store_location_2', value: '10, Yusuf street Oshodi, Lagos' },
-        { key: 'store_location_3', value: 'Road 4, Plot B, Carlton Gate estate, Ibadan, Oyo State' },
-        { key: 'store_location_4', value: '7B, road 7b, Obafemi Awolowo University, Ile ife, Osun State' },
-        { key: 'social_facebook', value: 'https://www.facebook.com/share/18yaDEg6ck/' },
-        { key: 'social_instagram', value: 'https://www.instagram.com/thespicepop?igsh=M3k3cm51aTQ3NG4=' },
-        { key: 'social_twitter', value: 'https://x.com/thespicepop?t=UjxyaAgKbIrvzCH1gFmbuA&s=09' },
-        { key: 'social_tiktok', value: 'https://www.tiktok.com/@spicepop?_t=ZM-8vpWf36RRDB&_r=1' }
-      ];
+    try {
+      const existingSettings = await this.withRateLimitRetry(() => this.getSettings());
       
-      for (const { key, value } of settings) {
-        await this.updateSetting(key, value);
+      if (existingSettings.length === 0) {
+        const settings: { key: string, value: string }[] = [
+          { key: 'site_name', value: 'SpicePop' },
+          { key: 'site_description', value: 'Nigerian Modern E-Commerce Platform for Spices and Foodstuffs' },
+          { key: 'founder', value: 'Iman Fasasi' },
+          { key: 'contact_email', value: 'info@spicepop.net' },
+          { key: 'contact_phone', value: '+2348068989798' },
+          { key: 'contact_whatsapp', value: '+2348068989798' },
+          { key: 'contact_address', value: '13, Signature estate Ikota, Lekki, Lagos, Nigeria' },
+          { key: 'store_location_1', value: '13, Signature estate Ikota, Lekki, Lagos, Nigeria' },
+          { key: 'store_location_2', value: '10, Yusuf street Oshodi, Lagos' },
+          { key: 'store_location_3', value: 'Road 4, Plot B, Carlton Gate estate, Ibadan, Oyo State' },
+          { key: 'store_location_4', value: '7B, road 7b, Obafemi Awolowo University, Ile ife, Osun State' },
+          { key: 'social_facebook', value: 'https://www.facebook.com/share/18yaDEg6ck/' },
+          { key: 'social_instagram', value: 'https://www.instagram.com/thespicepop?igsh=M3k3cm51aTQ3NG4=' },
+          { key: 'social_twitter', value: 'https://x.com/thespicepop?t=UjxyaAgKbIrvzCH1gFmbuA&s=09' },
+          { key: 'social_tiktok', value: 'https://www.tiktok.com/@spicepop?_t=ZM-8vpWf36RRDB&_r=1' }
+        ];
+        
+        // Process settings one by one with delay to avoid rate limits
+        for (const { key, value } of settings) {
+          await this.withRateLimitRetry(() => this.updateSetting(key, value));
+          // Add a small delay between operations to avoid rate limits
+          await new Promise(resolve => setTimeout(resolve, 500));
+        }
       }
+    } catch (error) {
+      console.error("Error in seedSettings with retry:", error);
+      throw error;
     }
   }
 
   private async seedBlogPosts() {
     try {
-      const existingPosts = await this.getBlogPosts();
+      const existingPosts = await this.withRateLimitRetry(() => this.getBlogPosts());
+      
       if (existingPosts.length === 0) {
-        const admin = await this.getUserByUsername('admin');
+        const admin = await this.withRateLimitRetry(() => this.getUserByUsername('admin'));
         if (!admin) {
           return;
         }
 
         // Get category IDs
-        const categories = await this.getCategories();
+        const categories = await this.withRateLimitRetry(() => this.getCategories());
         const spicesCategoryId = categories.find(c => c.slug === 'spices')?.id || null;
         const recipesCategoryId = categories.find(c => c.slug === 'recipe-bundles')?.id || null;
         
@@ -709,12 +812,16 @@ Visit our store to explore our selection of these traditional Nigerian superfood
           }
         ];
 
+        // Process blog posts one by one with delay to avoid rate limits
         for (const post of blogPosts) {
-          await this.createBlogPost(post);
+          await this.withRateLimitRetry(() => this.createBlogPost(post));
+          // Add a small delay between operations to avoid rate limits
+          await new Promise(resolve => setTimeout(resolve, 1000));
         }
       }
     } catch (error) {
-      console.error("Error seeding blog posts:", error);
+      console.error("Error in seedBlogPosts with retry:", error);
+      throw error;
     }
   }
 }
