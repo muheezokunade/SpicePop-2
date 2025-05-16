@@ -3,7 +3,7 @@ import session from 'express-session';
 import passport from 'passport';
 import { Strategy as LocalStrategy } from 'passport-local';
 import { storage } from './storage.js';
-import { db } from './db.js';
+import { db, getDatabaseStatus } from './db.js';
 import { settings } from '../shared/schema.js';
 import dotenv from 'dotenv';
 import bcrypt from 'bcryptjs';
@@ -66,7 +66,28 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-// Error handling middleware
+// Middleware to handle Neon control plane errors
+app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+  // Check if it's a control plane error
+  if (err && 
+     (err.message?.includes('Control plane request failed') || 
+      err.message?.includes('rate limit') ||
+      err.message?.includes('429'))) {
+    
+    console.error('Neon control plane error:', err);
+    
+    return res.status(503).json({
+      error: 'Database Service Unavailable',
+      message: 'The database service is temporarily unavailable. Please try again later.',
+      retryAfter: 10
+    });
+  }
+  
+  // Pass to next error handler if not a control plane error
+  next(err);
+});
+
+// General error handling middleware
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   console.error(err.stack);
   res.status(500).json({ 
@@ -577,13 +598,20 @@ app.get("/api/settings", async (req: Request, res: Response) => {
 
 // Health check endpoint
 app.get('/api/health', (_, res) => {
-  res.status(200).json({ status: 'ok' });
+  const dbStatus = getDatabaseStatus();
+  res.status(200).json({ 
+    status: 'ok',
+    database: dbStatus,
+    timestamp: new Date().toISOString()
+  });
 });
 
 // Basic status endpoint that doesn't require database access
 app.get('/status', (_, res) => {
+  const dbStatus = getDatabaseStatus();
   res.status(200).json({
     status: 'Service is running',
+    database: dbStatus,
     timestamp: new Date().toISOString(),
     environment: process.env.NODE_ENV || 'development',
     nodeVersion: process.version
