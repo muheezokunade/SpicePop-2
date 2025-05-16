@@ -401,23 +401,52 @@ export class DatabaseStorage implements IStorage {
   async seedInitialData() {
     console.log("Starting seeding process...");
     
+    // Create an in-memory flag to track if admin seeding was completed
+    let adminSeeded = false;
+    
     // Try each seeding operation independently
     try {
       console.log("1. Seeding admin...");
       await this.seedAdmin();
       console.log("✓ Admin seeded successfully");
+      adminSeeded = true;
     } catch (error) {
       console.error("Error seeding admin:", error);
     }
 
+    // Add a special check for categories since they're critical
     try {
-      console.log("2. Seeding categories...");
-      await this.seedCategories();
-      console.log("✓ Categories seeded successfully");
+      // First see if there are categories already
+      const existingCategories = await this.getCategories();
+      if (existingCategories.length > 0) {
+        console.log(`Found ${existingCategories.length} existing categories, skipping category seeding`);
+      } else {
+        console.log("2. Seeding categories...");
+        
+        // Special low-volume approach for categories (most important data)
+        const categories = [
+          { name: 'Spices', slug: 'spices', imageUrl: 'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=800&q=80' },
+          { name: 'Grains & Rice', slug: 'grains-rice', imageUrl: 'https://images.unsplash.com/photo-1586201375761-83865001e8d6?w=800&q=80' },
+        ];
+        
+        // Just seed two critical categories for now, one at a time with longer delays
+        for (const category of categories) {
+          try {
+            await this.createCategory(category);
+            console.log(`Created category: ${category.name}`);
+            await new Promise(resolve => setTimeout(resolve, 2000)); // 2 second delay
+          } catch (innerError) {
+            console.error(`Failed to create category ${category.name}:`, innerError);
+          }
+        }
+        
+        console.log("✓ Critical categories seeded successfully");
+      }
     } catch (error) {
-      console.error("Error seeding categories:", error);
+      console.error("Error checking or seeding categories:", error);
     }
 
+    // Continue with the rest of the seeding steps...
     try {
       console.log("3. Seeding products...");
       await this.seedProducts();
