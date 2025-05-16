@@ -133,9 +133,18 @@ const initializeDatabase = async () => {
   try {
     console.log("[express] Initializing database tables...");
     console.log("[express] Seeding initial data...");
-    await storage.seedInitialData();
+    
+    // Try to seed data but don't let it crash the app if it fails
+    try {
+      await storage.seedInitialData();
+      console.log("[express] Database initialization complete");
+    } catch (seedError) {
+      console.error("Error seeding initial data:", seedError);
+      console.log("[express] Application will continue without initial seed data");
+    }
   } catch (error) {
     console.error("Error initializing database:", error);
+    console.log("[express] Application will continue without database initialization");
   }
 };
 
@@ -420,6 +429,16 @@ app.get("/api/settings", async (req: Request, res: Response) => {
 // Health check endpoint
 app.get('/api/health', (_, res) => {
   res.status(200).json({ status: 'ok' });
+});
+
+// Basic status endpoint that doesn't require database access
+app.get('/status', (_, res) => {
+  res.status(200).json({
+    status: 'Service is running',
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development',
+    nodeVersion: process.version
+  });
 });
 
 // Initialize database on startup
