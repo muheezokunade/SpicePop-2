@@ -618,6 +618,40 @@ app.get('/status', (_, res) => {
   });
 });
 
+// Database verification endpoint
+app.get('/api/verify-db', async (req, res) => {
+  try {
+    // Check for basic data existence
+    const categoriesPromise = db.select().from(categories).limit(5);
+    const usersPromise = db.select().from(users).limit(1);
+    
+    // Run queries in parallel
+    const [foundCategories, foundUsers] = await Promise.all([
+      categoriesPromise, 
+      usersPromise
+    ]);
+    
+    res.json({
+      status: 'ok',
+      database: getDatabaseStatus(),
+      hasAdmin: foundUsers.length > 0,
+      adminUsername: foundUsers.length > 0 ? foundUsers[0].username : null,
+      categories: {
+        count: foundCategories.length,
+        items: foundCategories.map(c => c.name)
+      },
+      timestamp: new Date().toISOString()
+    });
+  } catch (error: any) {
+    console.error('Error verifying database:', error);
+    res.status(500).json({
+      status: 'error',
+      message: 'Failed to verify database state',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+});
+
 // Middleware to apply timeout to all API requests
 const timeoutMiddleware = (timeout = 15000) => (req: Request, res: Response, next: NextFunction) => {
   // Only apply timeout to API routes
@@ -656,39 +690,5 @@ app.use(timeoutMiddleware(15000)); // 15 second timeout
 
 // Initialize database on startup
 initializeDatabase();
-
-// Database verification endpoint
-app.get('/api/verify-db', async (req, res) => {
-  try {
-    // Check for basic data existence
-    const categoriesPromise = db.select().from(categories).limit(5);
-    const usersPromise = db.select().from(users).limit(1);
-    
-    // Run queries in parallel
-    const [foundCategories, foundUsers] = await Promise.all([
-      categoriesPromise, 
-      usersPromise
-    ]);
-    
-    res.json({
-      status: 'ok',
-      database: getDatabaseStatus(),
-      hasAdmin: foundUsers.length > 0,
-      adminUsername: foundUsers.length > 0 ? foundUsers[0].username : null,
-      categories: {
-        count: foundCategories.length,
-        items: foundCategories.map(c => c.name)
-      },
-      timestamp: new Date().toISOString()
-    });
-  } catch (error: any) {
-    console.error('Error verifying database:', error);
-    res.status(500).json({
-      status: 'error',
-      message: 'Failed to verify database state',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
-    });
-  }
-});
 
 export default app; 
