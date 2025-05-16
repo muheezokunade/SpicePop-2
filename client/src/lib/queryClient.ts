@@ -38,10 +38,14 @@ async function throwIfResNotOk(res: Response) {
   }
 }
 
+// Helper function to add delay with exponential backoff
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
 export async function apiRequest(
   method: string,
   url: string,
   data?: unknown | undefined,
+  retries = 3
 ): Promise<Response> {
   const headers: Record<string, string> = {};
   
@@ -64,15 +68,37 @@ export async function apiRequest(
     }
   }
   
-  const res = await fetch(url, {
-    method,
-    headers,
-    body: data ? JSON.stringify(data) : undefined,
-    credentials: "include",
-  });
+  try {
+    const res = await fetch(url, {
+      method,
+      headers,
+      body: data ? JSON.stringify(data) : undefined,
+      credentials: "include",
+    });
 
-  await throwIfResNotOk(res);
-  return res;
+    // Handle rate limiting specifically
+    if (res.status === 429 && retries > 0) {
+      // Get retry-after header or use exponential backoff
+      const retryAfter = res.headers.get('retry-after');
+      const delayTime = retryAfter ? parseInt(retryAfter, 10) * 1000 : Math.pow(2, 4 - retries) * 1000;
+      
+      console.log(`Rate limited. Retrying after ${delayTime}ms. Attempts left: ${retries-1}`);
+      await delay(delayTime);
+      return apiRequest(method, url, data, retries - 1);
+    }
+
+    await throwIfResNotOk(res);
+    return res;
+  } catch (error) {
+    // Retry on network errors with backoff
+    if (error instanceof TypeError && retries > 0) {
+      const delayTime = Math.pow(2, 4 - retries) * 1000;
+      console.log(`Network error. Retrying after ${delayTime}ms. Attempts left: ${retries-1}`);
+      await delay(delayTime);
+      return apiRequest(method, url, data, retries - 1);
+    }
+    throw error;
+  }
 }
 
 type UnauthorizedBehavior = "returnNull" | "throw";
@@ -99,17 +125,46 @@ export const getQueryFn: <T>(options: {
       }
     }
     
-    const res = await fetch(url, {
-      credentials: "include",
-      headers
-    });
-
-    if (unauthorizedBehavior === "returnNull" && res.status === 401) {
-      return null;
+    let retries = 3;
+    
+    while (retries >= 0) {
+      try {
+        const res = await fetch(url, {
+          credentials: "include",
+          headers
+        });
+        
+        if (unauthorizedBehavior === "returnNull" && res.status === 401) {
+          return null;
+        }
+        
+        // Handle rate limiting specifically
+        if (res.status === 429 && retries > 0) {
+          const retryAfter = res.headers.get('retry-after');
+          const delayTime = retryAfter ? parseInt(retryAfter, 10) * 1000 : Math.pow(2, 4 - retries) * 1000;
+          
+          console.log(`Rate limited. Retrying query after ${delayTime}ms. Attempts left: ${retries-1}`);
+          await delay(delayTime);
+          retries--;
+          continue;
+        }
+        
+        await throwIfResNotOk(res);
+        return await res.json();
+      } catch (error) {
+        // Retry on network errors with backoff
+        if (error instanceof TypeError && retries > 0) {
+          const delayTime = Math.pow(2, 4 - retries) * 1000;
+          console.log(`Network error in query. Retrying after ${delayTime}ms. Attempts left: ${retries-1}`);
+          await delay(delayTime);
+          retries--;
+          continue;
+        }
+        throw error;
+      }
     }
-
-    await throwIfResNotOk(res);
-    return await res.json();
+    
+    throw new Error("Maximum retries exceeded");
   };
 
 export const queryClient = new QueryClient({
@@ -119,10 +174,12 @@ export const queryClient = new QueryClient({
       refetchInterval: false,
       refetchOnWindowFocus: false,
       staleTime: Infinity,
-      retry: false,
+      retry: 3, // Enable react-query's built-in retry mechanism as well
+      retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000), // Exponential backoff with max of 30 seconds
     },
     mutations: {
-      retry: false,
+      retry: 2, // Also add retries for mutations
+      retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 10000),
     },
   },
 });

@@ -15,14 +15,45 @@ dotenv.config();
 // Initialize express app
 const app = express();
 
-// Security middleware
-const limiter = rateLimit({
+// Security middleware - general rate limiter
+const generalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100 // limit each IP to 100 requests per windowMs
+  max: 300, // 300 requests per windowMs
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: true, message: "Too many requests, please try again later." },
+  skipSuccessfulRequests: true // Don't count successful requests against the limit
 });
 
-// Apply rate limiting to all routes
-app.use(limiter);
+// Special limiter for read-heavy endpoints (GET requests)
+const readLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 500, // 500 requests per windowMs
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: true, message: "Too many read requests, please try again later." },
+  skipSuccessfulRequests: true
+});
+
+// Stricter limiter for write operations (POST/PUT/DELETE requests)
+const writeLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // 100 requests per windowMs
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: true, message: "Too many write requests, please try again later." }
+});
+
+// Apply rate limiting based on HTTP method
+app.use((req, res, next) => {
+  if (req.method === 'GET') {
+    return readLimiter(req, res, next);
+  } else if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(req.method)) {
+    return writeLimiter(req, res, next);
+  } else {
+    return generalLimiter(req, res, next);
+  }
+});
 
 // CORS configuration
 app.use(cors({
