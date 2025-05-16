@@ -4,6 +4,7 @@ import passport from 'passport';
 import { Strategy as LocalStrategy } from 'passport-local';
 import { storage } from './storage.js';
 import { db } from './db.js';
+import { settings } from '../shared/schema.js';
 import dotenv from 'dotenv';
 import bcrypt from 'bcryptjs';
 import rateLimit from 'express-rate-limit';
@@ -132,12 +133,74 @@ passport.deserializeUser(async (id: string, done: any) => {
 const initializeDatabase = async () => {
   try {
     console.log("[express] Initializing database tables...");
+    
+    // First, try a simple database query to validate connection
+    try {
+      const result = await db.select().from(settings).limit(1);
+      console.log("[express] Database connection validated:", result.length ? "Settings found" : "No settings found");
+    } catch (error) {
+      console.error("[express] Database connection check failed:", error);
+      console.log("[express] Will continue with initialization attempt anyway");
+    }
+    
     console.log("[express] Seeding initial data...");
     
     // Try to seed data but don't let it crash the app if it fails
     try {
-      await storage.seedInitialData();
-      console.log("[express] Database initialization complete");
+      // Start seeding with longer delays between operations
+      // This will ensure we're not hitting rate limits
+      const progressiveSeed = async () => {
+        try {
+          // First, seed admin user only and wait
+          await storage.seedAdminOnly();
+          console.log("[express] Admin user seeded");
+          
+          // Wait 3 seconds before continuing
+          await new Promise(resolve => setTimeout(resolve, 3000));
+          
+          // Then seed categories with a longer delay
+          await storage.seedCategoriesOnly();
+          console.log("[express] Categories seeded");
+          
+          // Wait 3 seconds before continuing
+          await new Promise(resolve => setTimeout(resolve, 3000));
+          
+          // Seed products
+          await storage.seedProductsOnly();
+          console.log("[express] Products seeded");
+          
+          // Wait 3 seconds before continuing
+          await new Promise(resolve => setTimeout(resolve, 3000));
+          
+          // Seed settings
+          await storage.seedSettingsOnly();
+          console.log("[express] Settings seeded");
+          
+          // Wait 3 seconds before continuing
+          await new Promise(resolve => setTimeout(resolve, 3000));
+          
+          // Finally seed blog posts
+          await storage.seedBlogPostsOnly();
+          console.log("[express] Blog posts seeded");
+          
+          return true;
+        } catch (error) {
+          console.error("[express] Progressive seeding failed:", error);
+          return false;
+        }
+      };
+      
+      // Try the progressive seeding approach
+      const progressiveSuccess = await progressiveSeed();
+      
+      if (progressiveSuccess) {
+        console.log("[express] Database initialization complete with progressive seeding");
+      } else {
+        // Fall back to regular seeding if progressive failed
+        console.log("[express] Falling back to regular seeding");
+        await storage.seedInitialData();
+        console.log("[express] Database initialization complete with regular seeding");
+      }
     } catch (seedError) {
       console.error("Error seeding initial data:", seedError);
       console.log("[express] Application will continue without initial seed data");

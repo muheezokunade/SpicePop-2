@@ -856,6 +856,62 @@ Visit our store to explore our selection of these traditional Nigerian superfood
       throw error;
     }
   }
+
+  // Individual seeding methods for progressive seeding
+  async seedAdminOnly(): Promise<void> {
+    try {
+      console.log("Running admin-only seeding...");
+      await this.seedAdmin();
+      console.log("Admin-only seeding completed");
+    } catch (error) {
+      console.error("Error in admin-only seeding:", error);
+      throw error;
+    }
+  }
+
+  async seedCategoriesOnly(): Promise<void> {
+    try {
+      console.log("Running categories-only seeding...");
+      await this.seedCategories();
+      console.log("Categories-only seeding completed");
+    } catch (error) {
+      console.error("Error in categories-only seeding:", error);
+      throw error;
+    }
+  }
+
+  async seedProductsOnly(): Promise<void> {
+    try {
+      console.log("Running products-only seeding...");
+      await this.seedProducts();
+      console.log("Products-only seeding completed");
+    } catch (error) {
+      console.error("Error in products-only seeding:", error);
+      throw error;
+    }
+  }
+
+  async seedSettingsOnly(): Promise<void> {
+    try {
+      console.log("Running settings-only seeding...");
+      await this.seedSettings();
+      console.log("Settings-only seeding completed");
+    } catch (error) {
+      console.error("Error in settings-only seeding:", error);
+      throw error;
+    }
+  }
+
+  async seedBlogPostsOnly(): Promise<void> {
+    try {
+      console.log("Running blog-posts-only seeding...");
+      await this.seedBlogPosts();
+      console.log("Blog-posts-only seeding completed");
+    } catch (error) {
+      console.error("Error in blog-posts-only seeding:", error);
+      throw error;
+    }
+  }
 }
 
 // Create and export database storage instance
